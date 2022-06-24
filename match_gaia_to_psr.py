@@ -1,7 +1,7 @@
 import astropy
 import astropy.units as u
 # inputs: ra, dec, height_of_rectangle, width_of_rectangle, radius_of_circle
-def psr_to_gaia(raj, decj, pmra, pmdec, posepoch, height=10*u.mas, width=10*u.mas, name=""):
+def psr_to_gaia(jname, raj, decj, pmra, pmdec, posepoch, height=10*u.mas, width=10*u.mas, name=""):
     """Search Gaia for Possible Companion to Pulsar
 
     Can search for a pulsar with the given name, or if no name is given, will search for pulsar
@@ -67,10 +67,12 @@ def psr_to_gaia(raj, decj, pmra, pmdec, posepoch, height=10*u.mas, width=10*u.ma
     width_gaia = u.Quantity(width, u.mas)
     height_gaia = u.Quantity(height, u.mas)
     results = Gaia.query_object_async(coordinate=coord, width=width_gaia, height=height_gaia)
-    results.show_in_notebook()
+    
+    return results
 
 
-f = open("input.csv", "r")
+f = open("name_input.csv", "r")
 for line in f:
   values = line.split(';')
-  psr_to_gaia(values[1], values[2], values[3], values[4], values[5])
+  print(values[1])
+  psr_to_gaia.show_in_notebook()
