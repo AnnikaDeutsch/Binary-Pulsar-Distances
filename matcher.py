@@ -7,7 +7,7 @@ from astropy.coordinates import Angle
 import numpy as np
 
 # inputs: ra, dec, height_of_rectangle, width_of_rectangle, radius_of_circle
-def psr_to_gaia(jname, raj, decj, pmra, pmdec, posepoch, height=1000000*u.mas, width=1000000*u.mas, name=""):
+def psr_to_gaia(jname, raj, decj, pmra, pmdec, posepoch, height, width, name=""):
     """Search Gaia for Possible Companion to Pulsar
 
     Given input parameters read in from a text file, queries Gaia DR2 to find matches 
@@ -15,27 +15,21 @@ def psr_to_gaia(jname, raj, decj, pmra, pmdec, posepoch, height=1000000*u.mas, w
 
     Args:
         jname (str): Name of the pulsar being checked for matches 
-        raj (:obj:`str`, optional): Right ascension of the pulsar in hh:mm:ss.ss format
-        decj (:obj:`str`, optional): Declination of the pulsar in degrees:mm:ss.ss format
-        radius (:obj:`float`, optional): Radius of ATNF search in degrees
-        height (:obj:`float`, optional): Height of Gaia search
-        width (:obj:`float`, optional): Width of Gaia search
-        name (:obj:`str`, optional)): Name of pulsar
-
-    Raises:
-        Exception: If name is given but not all three of raj, decj, and radius are given
-
-    # """
-
-    # if name == "":
-    #     if (raj == None or decj == None or radius == None):
-    #         raise Exception("If no name given, must provide a right ascension, declination, and radius")
+        raj (str): Right ascension of the pulsar in hh:mm:ss.ss format
+        decj (str): Declination of the pulsar in degrees:mm:ss.ss format
+        radius (str): Radius of ATNF search in degrees
+        height (str): Height of Gaia search in mas 
+        width (str): Width of Gaia search in mas 
+    
+    Returns:
+        Table: results of the Gaia query in an astropy Table  
+    """
 
     #Import things
 
-    # Given an item (via specifying ra/dec range or optionally inputing a pulsar name) from ATNF catalouge, find nearby
-    # Gaia objects
-    from astropy.time import Time
+    # Given an item (via specifying ra/dec range or optionally inputing a pulsar name) from ATNF catalouge, 
+    # find nearby Gaia objects
+    from astropy.time import Time 
     p_ra = raj
     p_dec = decj
     p_pmra = pmra
@@ -58,9 +52,6 @@ def psr_to_gaia(jname, raj, decj, pmra, pmdec, posepoch, height=1000000*u.mas, w
     p_new_ra = p_ra_ang + (p_pmra_deg * year_diff)
     p_new_dec = p_dec_ang + (p_pmdec_deg * year_diff)
 
-    # print('for '+table['JNAME'][pulsar]+' with Right Ascension'+p_new_ra+' and Declination'
-    # +p_new_dec+' in the Gaia epoch, the following Gaia objects are at the same RA and Dec to within a'+
-    # width+' by '+height+' milliacrsecond range:')
 
     # Query Gaia within the range of the given pulsar 
     coord=SkyCoord(ra=p_new_ra, dec=p_new_dec, unit=(u.degree, u.degree), frame='icrs')
@@ -75,32 +66,49 @@ def psr_to_gaia(jname, raj, decj, pmra, pmdec, posepoch, height=1000000*u.mas, w
         return results
 
 
-from astropy.table import Table, vstack
+def get_matches(input_file, output_file, height=1000000*u.mas, width=1000000*u.mas):
+    """Give Gaia matches to Pulsars 
 
-f = open("name_input.csv", "r")
-results = Table()
-first_time = True
+    Takes as input a text file (.csv file) with index number, name, ra, dec, proper
+    motion ra, proper motion dec and posepoch and produces all of the gaia matches
+    of ra and dec to within a certain range.
 
-counter = 0
+    Args: 
+        input_file (str): Name of the text file (csv) containing each pulsar with the parameters 'index', 'name', 
+          'ra', 'dec', 'pmra', 'pmdec', 'posepoch' row by row for each object.
+        output_file (str): Name of the text file which the pulsar-gaia matches will be output to.
+        height (:obj:'float', optional): Height of the rectangle Gaia will query in.
+        width (:obj:'float', optional): Width of the rectangle Gaia will query in.
 
-# Loop through file of ATNF data and combine tables of Gaia matches into one supertable
-for line in f:
-    # Loop 20 times
-  counter += 1
-  if (counter == 20):
-    break
+  
+    """
+    from astropy.table import Table, vstack
 
-    # Parse input
-  values = line.split(';')
+    f = open(input_file, "r")
+    results = Table()
+    first_time = True
 
-  # Add result to supertable
-  search_result = psr_to_gaia(values[1],values[2],values[3],values[4],values[5],values[6])
-  if (len(search_result) == 0):
-    continue
-  if first_time:
-    results = search_result
-    first_time = False
-  else:  
-    results = vstack([results, search_result])
+    counter = 0
 
-results.write('matches2.ecsv', format='csv', overwrite=True)
+    # Loop through file of ATNF data and combine tables of Gaia matches into one supertable
+    for line in f:
+      # Loop 20 times
+      counter += 1
+      if (counter == 20):
+        break
+
+      # Parse input
+      values = line.split(';')
+
+      # Add result to supertable
+      search_result = psr_to_gaia(values[1],values[2],values[3],values[4],values[5],values[6], height, width)
+      if (len(search_result) == 0):
+        continue
+      if first_time:
+        results = search_result
+        first_time = False
+      else:  
+        results = vstack([results, search_result])
+
+    results.write(output_file, format='csv', overwrite=True)
+
