@@ -7,10 +7,11 @@ Welcome to Pulsar Companion Search's documentation!
 ===================================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
    
    psr_to_gaia.rst
+   get_matches.rst
 
 
 Indices and tables
