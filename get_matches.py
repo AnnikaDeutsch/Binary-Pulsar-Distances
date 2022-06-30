@@ -7,7 +7,7 @@ from astropy.coordinates import Angle
 import numpy as np
 
 # inputs: ra, dec, height_of_rectangle, width_of_rectangle, radius_of_circle
-def psr_to_gaia(jname, raj, decj, pmra, pmdec, posepoch, height, width, name=""):
+def psr_to_gaia(jname, raj, rajerr, decj, decjerr,  pmra, pmraerr, pmdec, pmdecerr, posepoch, height, width):
     """Search Gaia for Possible Companion to Pulsar
 
     Given input parameters read in from a text file, queries Gaia DR2 to find matches 
@@ -52,6 +52,12 @@ def psr_to_gaia(jname, raj, decj, pmra, pmdec, posepoch, height, width, name="")
     p_new_ra = p_ra_ang + (p_pmra_deg * year_diff)
     p_new_dec = p_dec_ang + (p_pmdec_deg * year_diff)
 
+    ra_ext_pos = raj + rajerr + (pmra + pmraerr)*year_diff
+    ra_ext_neg = raj - rajerr + (pmra - pmraerr)*year_diff
+
+    dec_ext_pos = decj + decjerr + (pmdec + pmdecerr)*year_diff
+    dec_ext_neg = decj - decjerr + (pmdec - pmdecerr)*year_diff
+
 
     # Query Gaia within the range of the given pulsar 
     coord=SkyCoord(ra=p_new_ra, dec=p_new_dec, unit=(u.degree, u.degree), frame='icrs')
@@ -65,7 +71,7 @@ def psr_to_gaia(jname, raj, decj, pmra, pmdec, posepoch, height, width, name="")
         results.add_column(jname, name='Companion Pulsar', index=0)
         return results
 
-def get_matches(input_file, output_file, height=1000000.*u.mas, width=1000000.*u.mas):
+def get_matches(input_file, output_file, height=1.*u.arcmin, width=1.*u.arcmin):
     """Give Gaia matches to Pulsars 
 
     Takes as input a text file (.csv file) with index number, name, ra, dec, proper
