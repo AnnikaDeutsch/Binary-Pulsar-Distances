@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from astropy.visualization import quantity_support
 from astropy.time import Time 
+import os
 
 # inputs: ra, dec, height_of_rectangle, width_of_rectangle, radius_of_circle
 def psr_to_gaia(jname, raj, rajerr, decj, decjerr,  pmra, pmraerr, pmdec, pmdecerr, posepoch, height, width):
@@ -214,7 +215,7 @@ def compare_pos_param_space(psr_name, ra, ra_err, dec, dec_err, pmra, pmra_err, 
       values = line.split(',')
       if not_zero == 0:
           not_zero+=1
-      elif values[0] == 'J0024-7204Z':
+      elif values[0] == psr_name:
           # if float(values[8]) <= 0.1 and float(values[10]) <= 0.1:
               with quantity_support():
                   ax1.errorbar(float(values[7])*u.deg, float(values[9])*u.deg, float(values[8])*u.mas,
@@ -227,5 +228,86 @@ def compare_pos_param_space(psr_name, ra, ra_err, dec, dec_err, pmra, pmra_err, 
   ax1.set_ylabel(r'$\theta_{\delta}$', fontsize=16)
 
   plt.tight_layout()
+
+
+
+def pos_vs_pm(psr_name, ra, ra_err, dec, dec_err, pmra, pmdec, pos_epoch, gaia_matches_filename):
+  """plot proper motion vs. position for both right ascesnsion and declination for the matches of one pulsar 
+  
+  """
+  # instantiate a new figure object that will have 2 x axes and 2 y axes 
+  fig, (axa,axb) = plt.subplots(1,2, figsize=(10,5))
+
+  ra = ra 
+  dec = dec 
+  ra_err = ra_err*u.deg # must be floats
+  dec_err = dec_err*u.deg # must be floats
+
+  ra_ang = Angle(ra, u.deg)
+  dec_ang = Angle(dec, u.deg)
+
+  # this part is to plot the region within the propogated error after updating to the gaia epoch
+
+  posepoch = pos_epoch
+
+  p_epoch = Time(posepoch, format='mjd').jyear
+  gaia_epoch = 2015.5 * u.yr
+  year_diff = gaia_epoch - p_epoch.tolist() * u.yr
+
+  new_ra = ra_ang + (pmra.to(u.deg/u.yr)*year_diff)
+  new_dec = dec_ang + (pmdec.to(u.deg/u.yr)*year_diff)
+
+  axa.plot(new_ra, pmra, 'bo')
+
+  # read the csv file containing the gaia "matches" identified by get_matches()
+  f = open(gaia_matches_filename, 'r')
+  not_zero = 0 # counter that skips the first line in the text file, which is just a header 
+  for line in f:
+      values = line.split(',') # create a table containing the values of a given line of the file
+      if not_zero == 0:
+          not_zero+=1 # skips the first line of the file 
+      elif values[0] == psr_name: # only looks at matches to the pulsar we are concerned about 
+          if values[14] != '': # avoids entries that don't have a pm measurement 
+              with quantity_support(): # plot the pm's of a gaia object with error bars 
+                  axa.plot(float(values[7]), float(values[14]), 'ro')
+      else:
+          break # break once it has gone through every match for the given pulsar; we will have to modify this to work 
+                # generically once we put it in a function 
+  
+  axb.plot(new_dec, pmdec, 'bo')
+
+  # read the csv file containing the gaia "matches" identified by get_matches()
+  f = open(gaia_matches_filename, 'r')
+  not_zero = 0 # counter that skips the first line in the text file, which is just a header 
+  for line in f:
+      values = line.split(',') # create a table containing the values of a given line of the file
+      if not_zero == 0:
+          not_zero+=1 # skips the first line of the file 
+      elif values[0] == psr_name: # only looks at matches to the pulsar we are concerned about 
+          if values[16] != '': # avoids entries that don't have a pm measurement 
+              with quantity_support(): # plot the pm's of a gaia object with error bars 
+                  axb.plot(float(values[9]), float(values[16]), 'ro')
+      else:
+          break # break once it has gone through every match for the given pulsar; we will have to modify this to work 
+                # generically once we put it in a function 
+  
+  axa.set_title('Right Ascension vs. Proper Motion in RA')
+  axa.set_xlabel(r'$\alpha$ (deg)')
+  axa.set_ylabel(r'$\mu_{\alpha}$ (mas)')
+
+  axb.set_title('Declination vs. Proper Motion in Dec')
+  axb.set_xlabel(r'$\delta$ (deg)')
+  axb.set_ylabel(r'$\mu_{\delta}$ (mas)')
+
+  fig.suptitle(psr_name, fontsize=14)
+
+  plt.tight_layout()
+
+  my_path = os.path.abspath('plots')
+  my_file = 'pos_vs_pms.pdf'
+  plt.savefig(os.path.join(my_path, my_file))
+
+
+
 
 
