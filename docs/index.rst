@@ -10,7 +10,6 @@ Welcome to Pulsar Companion Search's documentation!
    :maxdepth: 3
    :caption: Contents:
    
-   psr_to_gaia.rst
    get_matches.rst
 
 
