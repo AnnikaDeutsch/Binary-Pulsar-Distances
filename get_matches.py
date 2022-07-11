@@ -11,7 +11,7 @@ from astropy.time import Time
 import os
 
 # inputs: ra, dec, height_of_rectangle, width_of_rectangle, radius_of_circle
-def psr_to_gaia(jname, raj, rajerr, decj, decjerr,  pmra, pmraerr, pmdec, pmdecerr, posepoch, height, width):
+def psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, height, width):
     """Search Gaia for Possible Companion to Pulsar
 
     Given input parameters read in from a text file, queries Gaia DR2 to find matches 
@@ -65,8 +65,8 @@ def psr_to_gaia(jname, raj, rajerr, decj, decjerr,  pmra, pmraerr, pmdec, pmdece
 
     # Query Gaia within the range of the given pulsar 
     coord=SkyCoord(ra=p_new_ra, dec=p_new_dec, unit=(u.degree, u.degree), frame='icrs')
-    width_gaia = u.Quantity(width, u.mas)
-    height_gaia = u.Quantity(height, u.mas)
+    width_gaia = u.Quantity(width, u.arcmin)
+    height_gaia = u.Quantity(height, u.arcmin)
     results = Gaia.query_object_async(coordinate=coord, width=width_gaia, height=height_gaia)
     
     if len(results) == 0:
@@ -75,7 +75,7 @@ def psr_to_gaia(jname, raj, rajerr, decj, decjerr,  pmra, pmraerr, pmdec, pmdece
         results.add_column(jname, name='Companion Pulsar', index=0)
         return results
 
-def get_matches(input_file, output_file, height=1.*u.arcmin, width=1.*u.arcmin):
+def get_matches(input_file, output_file, height=1., width=1.):
     """Give Gaia matches to Pulsars 
 
     Takes as input a text file (.csv file) with index number, name, ra, dec, proper
@@ -171,6 +171,11 @@ def compare_pos_param_space(psr_name, ra, ra_err, dec, dec_err, pmra, pmra_err, 
   ra_err = ra_err*u.deg # must be floats
   dec_err = dec_err*u.deg # must be floats
 
+  pmra = pmra*u.mas/u.yr
+  pmra_err = pmra_err * u.mas / u.yr
+  pmdec = pmdec * u.mas / u.yr
+  pmdec_err = pmdec_err * u.mas / u.yr
+
   ra_ang = Angle(ra, u.deg)
   dec_ang = Angle(dec, u.deg)
 
@@ -228,6 +233,8 @@ def compare_pos_param_space(psr_name, ra, ra_err, dec, dec_err, pmra, pmra_err, 
   ax1.set_ylabel(r'$\theta_{\delta}$', fontsize=16)
 
   plt.tight_layout()
+
+  plt.savefig(psr_name + 'pos_cartesian.pdf')
 
 
 
@@ -306,6 +313,14 @@ def pos_vs_pm(psr_name, ra, ra_err, dec, dec_err, pmra, pmdec, pos_epoch, gaia_m
   my_path = os.path.abspath('plots')
   my_file = 'pos_vs_pms.pdf'
   plt.savefig(os.path.join(my_path, my_file))
+
+
+# get_matches('single_match_input.csv', 'actual_match.csv')
+# compare_pos_param_space('J1816+4510', '18:16:35.93436', 0.00007, '45:10:33.8618', 0.0004, 5.3, 0.8, -3, 1, 56047, 'actual_match.csv')
+
+
+get_matches('single_match_input.csv', 'cross_check.csv')
+
 
 
 
