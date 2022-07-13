@@ -7,10 +7,11 @@ Welcome to Pulsar Companion Search's documentation!
 ===================================================
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 4
    :caption: Contents:
    
    get_matches.rst
+   compare_equitorial.rst
 
 
 Indices and tables
