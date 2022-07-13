@@ -84,12 +84,12 @@ def get_matches(input_file, output_file, height=1., width=1.):
 
     Args: 
         input_file (str): Name of the text file (csv) containing each pulsar with the parameters 'index', 'name', 
-          'ra', 'dec', 'pmra', 'pmdec', 'posepoch' row by row for each object.
+            'ra', 'dec', 'pmra', 'pmdec', 'posepoch' row by row for each object.
         output_file (str): Name of the text file which the pulsar-gaia matches will be output to.
         height (:obj:'float', optional): Height of the rectangle Gaia will query in.
         width (:obj:'float', optional): Width of the rectangle Gaia will query in.
 
-  
+
     """
     from astropy.table import Table, vstack
 
@@ -123,196 +123,249 @@ def get_matches(input_file, output_file, height=1., width=1.):
 
 
 def compare_pm_param_space(psr_name, pmra, pmra_err, pmdec, pmdec_err, gaia_matches_filename):
-  """Plots pm parameter space for Gaia matches of one pulsar in cartesian coordinates 
-  
-  """
-  # instantiate a figure and axis object where we will plot everything relating to the pm parameter space 
-  fig, ax = plt.subplots(figsize=(16,4)) 
+    """Plots proper motion parameter space for gaia matches of one pulsar in cartesian coordinates
 
-  # create variables for pmra, pmdec, and their errors
-  pmra = pmra * u.mas / u.yr
-  pmra_err = pmra_err * u.mas / u.yr
-  pmdec = pmdec * u.mas / u.yr
-  pmdec_err = pmdec_err * u.mas / u.yr
+    Plots the pmra vs pmdec for all the matches of a given pulsar in cartesian coordinates, 
+    just to see the comparison between the proper motion of the pulsar and the identified matches in the parameter 
+    space
 
-  # plot the \mu in \alpha and \delta of the actual pulsar 
-  with quantity_support(): # to make sure astropy quantities get plotted properly 
-      ax.errorbar(pmra, pmdec, pmdec_err, pmra_err, 'bo') 
+    Args:
+        psr_name (str): Name of the pulsar whose proper motions we are plotting and comparing to the position of 
+            the pulsar.
+        pmra (float): Proper motion in ra of the pulsar as a float (mas/yr)
+        pmra_err (float): Proper motion in ra error of the pulsar as a float (mas/yr)
+        pmdec (float): Proper motion in dec of the pulsar as a float (mas/yr)
+        pmdec_err (float): Proper motion in dec of the pulsar as a float (mas/yr)
+        gaia_matches_filename (str): Full filename of the csv file that holds the gaia matches for a list of 
+            pulsars, equivalent to the output of get_matches. This is the file that will be parsed to plot the
+            positions of the matches 
+    """
+    # instantiate a figure and axis object where we will plot everything relating to the pm parameter space 
+    fig, ax = plt.subplots(figsize=(16,4)) 
 
-  # read the csv file containing the gaia "matches" identified by get_matches()
-  f = open(gaia_matches_filename, 'r')
-  not_zero = 0 # counter that skips the first line in the text file, which is just a header 
-  for line in f:
-      values = line.split(',') # create a table containing the values of a given line of the file
-      if not_zero == 0:
-          not_zero+=1 # skips the first line of the file 
-      elif values[0] == psr_name: # only looks at matches to the pulsar we are concerned about 
-          if values[14] != '': # avoids entries that don't have a pm measurement 
-              with quantity_support(): # plot the pm's of a gaia object with error bars 
-                  ax.errorbar(float(values[14]), float(values[16]), float(values[15]), float(values[17]), 'ro')
-      else:
-        break # break once it has gone through every match for the given pulsar; we will have to modify this to work 
-              # generically once we put it in a function 
+    # create variables for pmra, pmdec, and their errors
+    pmra = pmra * u.mas / u.yr
+    pmra_err = pmra_err * u.mas / u.yr
+    pmdec = pmdec * u.mas / u.yr
+    pmdec_err = pmdec_err * u.mas / u.yr
 
-  ax.set_title('Proper motions for possible Gaia matches to PSR {}'.format(psr_name), fontsize=16)
-  ax.set_xlabel(r'$\mu_{\alpha}$ (mas)', fontsize=16)
-  ax.set_ylabel(r'$\mu_{\delta}$ (mas)', fontsize=16)
+    # plot the \mu in \alpha and \delta of the actual pulsar 
+    with quantity_support(): # to make sure astropy quantities get plotted properly 
+        ax.errorbar(pmra, pmdec, pmdec_err, pmra_err, 'bo') 
+
+    # read the csv file containing the gaia "matches" identified by get_matches()
+    f = open(gaia_matches_filename, 'r')
+    not_zero = 0 # counter that skips the first line in the text file, which is just a header 
+    for line in f:
+        values = line.split(',') # create a table containing the values of a given line of the file
+        if not_zero == 0:
+            not_zero+=1 # skips the first line of the file 
+        elif values[0] == psr_name: # only looks at matches to the pulsar we are concerned about 
+            if values[14] != '': # avoids entries that don't have a pm measurement 
+                with quantity_support(): # plot the pm's of a gaia object with error bars 
+                    ax.errorbar(float(values[14]), float(values[16]), float(values[15]), float(values[17]), 'ro')
+        else:
+            break # break once it has gone through every match for the given pulsar; we will have to modify this to work 
+                # generically once we put it in a function 
+
+    ax.set_title('Proper motions for possible Gaia matches to PSR {}'.format(psr_name), fontsize=16)
+    ax.set_xlabel(r'$\mu_{\alpha}$ (mas)', fontsize=16)
+    ax.set_ylabel(r'$\mu_{\delta}$ (mas)', fontsize=16)
 
 
 def compare_pos_param_space(psr_name, ra, ra_err, dec, dec_err, pmra, pmra_err, pmdec, pmdec_err, pos_epoch, 
   gaia_matches_filename):
-  """plots position parameter space for Gaia matches of one pulsar in cartesian coordinates 
-  
-  """
-  fig1, ax1 = plt.subplots(figsize=(16,4)) 
+    """Plots position parameter space for gaia matches of one pulsar in cartesian coordinates
 
-  ra = ra 
-  dec = dec 
-  ra_err = ra_err*u.deg # must be floats
-  dec_err = dec_err*u.deg # must be floats
+    Plots the right ascension vs declination for all the matches of a given pulsar in cartesian coordinates, 
+    just to see the comparison between the position of the pulsar and the identified matches in the parameter 
+    space
 
-  pmra = pmra*u.mas/u.yr
-  pmra_err = pmra_err * u.mas / u.yr
-  pmdec = pmdec * u.mas / u.yr
-  pmdec_err = pmdec_err * u.mas / u.yr
+    Args:
+        psr_name (str): Name of the pulsar whose positions we are plotting and comparing to the position of 
+            the pulsar.
+        ra (str): Right ascension of the pulsar in hms exactly as it is in the input file of pulsars 
+            from ATNF, as a string. (hms string separated by :)
+        ra_err (float): Right ascension error of the pulsar as a float. (deg)
+        dec (str): Declinations of the pulsar in hms exactlt as it is in the input file of pulsars 
+            from ATNF, as a string. (hms string separated by :)
+        dec_err (float): Declination error of the pulsar as a float. (deg)
+        pmra (float): Proper motion in ra of the pulsar as a float (mas/yr)
+        pmra_err (float): Proper motion in ra error of the pulsar as a float (mas/yr)
+        pmdec (float): Proper motion in dec of the pulsar as a float (mas/yr)
+        pmdec_err (float): Proper motion in dec of the pulsar as a float (mas/yr)
+        pos_epoch (int): Epoch that the pulsar data was taken as an int (MJD)
+        gaia_matches_filename (str): Full filename of the csv file that holds the gaia matches for a list of 
+            pulsars, equivalent to the output of get_matches. This is the file that will be parsed to plot the
+            positions of the matches 
+    """
+    fig1, ax1 = plt.subplots(figsize=(16,4)) 
 
-  ra_ang = Angle(ra, u.deg)
-  dec_ang = Angle(dec, u.deg)
+    ra = ra 
+    dec = dec 
+    ra_err = ra_err*u.deg # must be floats
+    dec_err = dec_err*u.deg # must be floats
 
-  # this part is to plot the region within the propogated error after updating to the gaia epoch
+    pmra = pmra*u.mas/u.yr
+    pmra_err = pmra_err * u.mas / u.yr
+    pmdec = pmdec * u.mas / u.yr
+    pmdec_err = pmdec_err * u.mas / u.yr
 
-  posepoch = pos_epoch
+    ra_ang = Angle(ra, u.deg)
+    dec_ang = Angle(dec, u.deg)
 
-  p_epoch = Time(posepoch, format='mjd').jyear
-  gaia_epoch = 2015.5 * u.yr
-  year_diff = gaia_epoch - p_epoch.tolist() * u.yr
+    # this part is to plot the region within the propogated error after updating to the gaia epoch
 
-  bound1 = (ra_ang + ra_err) + ((pmra.to(u.deg/u.yr) + pmra_err.to(u.deg/u.yr))*year_diff) # right x err
-  bound2 = (dec_ang + dec_err) + ((pmdec.to(u.deg/u.yr) + pmdec_err.to(u.deg/u.yr))*year_diff) # top y err
+    posepoch = pos_epoch
 
-  bound3 = (ra_ang - ra_err) + ((pmra.to(u.deg/u.yr) - pmra_err.to(u.deg/u.yr))*year_diff) # left x err
-  bound4 = (dec_ang - dec_err) + ((pmdec.to(u.deg/u.yr) - pmdec_err.to(u.deg/u.yr))*year_diff) # bottom y err
-  bounds = [bound1, bound3, bound2, bound4]
+    p_epoch = Time(posepoch, format='mjd').jyear
+    gaia_epoch = 2015.5 * u.yr
+    year_diff = gaia_epoch - p_epoch.tolist() * u.yr
 
-  asym_err_x = [[bound3], [bound1]]
-  asym_err_y = [[bound4], [bound2]]
+    bound1 = (ra_ang + ra_err) + ((pmra.to(u.deg/u.yr) + pmra_err.to(u.deg/u.yr))*year_diff) # right x err
+    bound2 = (dec_ang + dec_err) + ((pmdec.to(u.deg/u.yr) + pmdec_err.to(u.deg/u.yr))*year_diff) # top y err
 
-  largest_err = 0
-  for bound in bounds:
-      if bound > largest_err:
-          largest_err = bound 
+    bound3 = (ra_ang - ra_err) + ((pmra.to(u.deg/u.yr) - pmra_err.to(u.deg/u.yr))*year_diff) # left x err
+    bound4 = (dec_ang - dec_err) + ((pmdec.to(u.deg/u.yr) - pmdec_err.to(u.deg/u.yr))*year_diff) # bottom y err
+    bounds = [bound1, bound3, bound2, bound4]
 
-  new_ra = ra_ang + (pmra.to(u.deg/u.yr)*year_diff)
-  new_dec = dec_ang + (pmdec.to(u.deg/u.yr)*year_diff)
+    asym_err_x = [[bound3], [bound1]]
+    asym_err_y = [[bound4], [bound2]]
 
-  region = plt.Circle((new_ra, new_dec), largest_err-new_ra, color='g', alpha=0.2)
+    largest_err = 0
+    for bound in bounds:
+        if bound > largest_err:
+            largest_err = bound 
 
-  # plot the \mu in \alpha and \delta of the actual pulsar 
-  with quantity_support():
-      ax1.errorbar(ra_ang, dec_ang, dec_err, ra_err, 'bo') 
-      ax1.plot(new_ra, new_dec, 'bo')
-      ax1.add_patch(region)
-  # plt.xlim([-1,2])
-  # plt.ylim([-75,70])
-  f = open(gaia_matches_filename, 'r')
-  not_zero = 0
-  for line in f:
-      values = line.split(',')
-      if not_zero == 0:
-          not_zero+=1
-      elif values[0] == psr_name:
-          # if float(values[8]) <= 0.1 and float(values[10]) <= 0.1:
-              with quantity_support():
-                  ax1.errorbar(float(values[7])*u.deg, float(values[9])*u.deg, float(values[8])*u.mas,
-                  float(values[10])*u.mas, 'ro')
-      else:
-          break
+    new_ra = ra_ang + (pmra.to(u.deg/u.yr)*year_diff)
+    new_dec = dec_ang + (pmdec.to(u.deg/u.yr)*year_diff)
 
-  ax1.set_title('Angular offsets of Gaia matches from PSR J0024-7204Z', fontsize=16)
-  ax1.set_xlabel(r'$\theta_{\alpha}$', fontsize=16)
-  ax1.set_ylabel(r'$\theta_{\delta}$', fontsize=16)
+    region = plt.Circle((new_ra, new_dec), largest_err-new_ra, color='g', alpha=0.2)
 
-  plt.tight_layout()
+    # plot the \mu in \alpha and \delta of the actual pulsar 
+    with quantity_support():
+        ax1.errorbar(ra_ang, dec_ang, dec_err, ra_err, 'bo') 
+        ax1.plot(new_ra, new_dec, 'bo')
+        ax1.add_patch(region)
+    # plt.xlim([-1,2])
+    # plt.ylim([-75,70])
+    f = open(gaia_matches_filename, 'r')
+    not_zero = 0
+    for line in f:
+        values = line.split(',')
+        if not_zero == 0:
+            not_zero+=1
+        elif values[0] == psr_name:
+            # if float(values[8]) <= 0.1 and float(values[10]) <= 0.1:
+                with quantity_support():
+                    ax1.errorbar(float(values[7])*u.deg, float(values[9])*u.deg, float(values[8])*u.mas,
+                    float(values[10])*u.mas, 'ro')
+        else:
+            break
 
-  plt.savefig(psr_name + 'pos_cartesian.pdf')
+    ax1.set_title('Angular offsets of Gaia matches from PSR J0024-7204Z', fontsize=16)
+    ax1.set_xlabel(r'$\theta_{\alpha}$', fontsize=16)
+    ax1.set_ylabel(r'$\theta_{\delta}$', fontsize=16)
+
+    plt.tight_layout()
+
+    plt.savefig(psr_name + 'pos_cartesian.pdf')
 
 
 
 def pos_vs_pm(psr_name, ra, ra_err, dec, dec_err, pmra, pmdec, pos_epoch, gaia_matches_filename):
-  """plot proper motion vs. position for both right ascesnsion and declination for the matches of one pulsar 
-  
-  """
-  # instantiate a new figure object that will have 2 x axes and 2 y axes 
-  fig, (axa,axb) = plt.subplots(1,2, figsize=(10,5))
+    """Plots position vs pm for a given pulsar 
 
-  ra = ra 
-  dec = dec 
-  ra_err = ra_err*u.deg # must be floats
-  dec_err = dec_err*u.deg # must be floats
+    Plots the position vs proper motion for all the matches of a given pulsar in cartesian coordinates, 
+    in either ra or dec. 
 
-  ra_ang = Angle(ra, u.deg)
-  dec_ang = Angle(dec, u.deg)
+    Args:
+        psr_name (str): Name of the pulsar whose positions we are plotting and comparing to the position of 
+            the pulsar.
+        ra (str): Right ascension of the pulsar in hms exactly as it is in the input file of pulsars 
+            from ATNF, as a string. (hms string separated by :)
+        ra_err (float): Right ascension error of the pulsar as a float. (deg)
+        dec (str): Declinations of the pulsar in hms exactlt as it is in the input file of pulsars 
+            from ATNF, as a string. (hms string separated by :)
+        dec_err (float): Declination error of the pulsar as a float. (deg)
+        pmra (float): Proper motion in ra of the pulsar as a float (mas/yr)
+        pmdec (float): Proper motion in dec of the pulsar as a float (mas/yr)
+        pos_epoch (int): Epoch that the pulsar data was taken as an int (MJD)
+        gaia_matches_filename (str): Full filename of the csv file that holds the gaia matches for a list of 
+            pulsars, equivalent to the output of get_matches. This is the file that will be parsed to plot the
+            positions of the matches 
+    """
+    # instantiate a new figure object that will have 2 x axes and 2 y axes 
+    fig, (axa,axb) = plt.subplots(1,2, figsize=(10,5))
 
-  # this part is to plot the region within the propogated error after updating to the gaia epoch
+    ra = ra 
+    dec = dec 
+    ra_err = ra_err*u.deg # must be floats
+    dec_err = dec_err*u.deg # must be floats
 
-  posepoch = pos_epoch
+    ra_ang = Angle(ra, u.deg)
+    dec_ang = Angle(dec, u.deg)
 
-  p_epoch = Time(posepoch, format='mjd').jyear
-  gaia_epoch = 2015.5 * u.yr
-  year_diff = gaia_epoch - p_epoch.tolist() * u.yr
+    # this part is to plot the region within the propogated error after updating to the gaia epoch
 
-  new_ra = ra_ang + (pmra.to(u.deg/u.yr)*year_diff)
-  new_dec = dec_ang + (pmdec.to(u.deg/u.yr)*year_diff)
+    posepoch = pos_epoch
 
-  axa.plot(new_ra, pmra, 'bo')
+    p_epoch = Time(posepoch, format='mjd').jyear
+    gaia_epoch = 2015.5 * u.yr
+    year_diff = gaia_epoch - p_epoch.tolist() * u.yr
 
-  # read the csv file containing the gaia "matches" identified by get_matches()
-  f = open(gaia_matches_filename, 'r')
-  not_zero = 0 # counter that skips the first line in the text file, which is just a header 
-  for line in f:
-      values = line.split(',') # create a table containing the values of a given line of the file
-      if not_zero == 0:
-          not_zero+=1 # skips the first line of the file 
-      elif values[0] == psr_name: # only looks at matches to the pulsar we are concerned about 
-          if values[14] != '': # avoids entries that don't have a pm measurement 
-              with quantity_support(): # plot the pm's of a gaia object with error bars 
-                  axa.plot(float(values[7]), float(values[14]), 'ro')
-      else:
-          break # break once it has gone through every match for the given pulsar; we will have to modify this to work 
-                # generically once we put it in a function 
-  
-  axb.plot(new_dec, pmdec, 'bo')
+    new_ra = ra_ang + (pmra.to(u.deg/u.yr)*year_diff)
+    new_dec = dec_ang + (pmdec.to(u.deg/u.yr)*year_diff)
 
-  # read the csv file containing the gaia "matches" identified by get_matches()
-  f = open(gaia_matches_filename, 'r')
-  not_zero = 0 # counter that skips the first line in the text file, which is just a header 
-  for line in f:
-      values = line.split(',') # create a table containing the values of a given line of the file
-      if not_zero == 0:
-          not_zero+=1 # skips the first line of the file 
-      elif values[0] == psr_name: # only looks at matches to the pulsar we are concerned about 
-          if values[16] != '': # avoids entries that don't have a pm measurement 
-              with quantity_support(): # plot the pm's of a gaia object with error bars 
-                  axb.plot(float(values[9]), float(values[16]), 'ro')
-      else:
-          break # break once it has gone through every match for the given pulsar; we will have to modify this to work 
-                # generically once we put it in a function 
-  
-  axa.set_title('Right Ascension vs. Proper Motion in RA')
-  axa.set_xlabel(r'$\alpha$ (deg)')
-  axa.set_ylabel(r'$\mu_{\alpha}$ (mas)')
+    axa.plot(new_ra, pmra, 'bo')
 
-  axb.set_title('Declination vs. Proper Motion in Dec')
-  axb.set_xlabel(r'$\delta$ (deg)')
-  axb.set_ylabel(r'$\mu_{\delta}$ (mas)')
+    # read the csv file containing the gaia "matches" identified by get_matches()
+    f = open(gaia_matches_filename, 'r')
+    not_zero = 0 # counter that skips the first line in the text file, which is just a header 
+    for line in f:
+        values = line.split(',') # create a table containing the values of a given line of the file
+        if not_zero == 0:
+            not_zero+=1 # skips the first line of the file 
+        elif values[0] == psr_name: # only looks at matches to the pulsar we are concerned about 
+            if values[14] != '': # avoids entries that don't have a pm measurement 
+                with quantity_support(): # plot the pm's of a gaia object with error bars 
+                    axa.plot(float(values[7]), float(values[14]), 'ro')
+        else:
+            break # break once it has gone through every match for the given pulsar; we will have to modify this to work 
+                    # generically once we put it in a function 
+    
+    axb.plot(new_dec, pmdec, 'bo')
 
-  fig.suptitle(psr_name, fontsize=14)
+    # read the csv file containing the gaia "matches" identified by get_matches()
+    f = open(gaia_matches_filename, 'r')
+    not_zero = 0 # counter that skips the first line in the text file, which is just a header 
+    for line in f:
+        values = line.split(',') # create a table containing the values of a given line of the file
+        if not_zero == 0:
+            not_zero+=1 # skips the first line of the file 
+        elif values[0] == psr_name: # only looks at matches to the pulsar we are concerned about 
+            if values[16] != '': # avoids entries that don't have a pm measurement 
+                with quantity_support(): # plot the pm's of a gaia object with error bars 
+                    axb.plot(float(values[9]), float(values[16]), 'ro')
+        else:
+            break # break once it has gone through every match for the given pulsar; we will have to modify this to work 
+                    # generically once we put it in a function 
+    
+    axa.set_title('Right Ascension vs. Proper Motion in RA')
+    axa.set_xlabel(r'$\alpha$ (deg)')
+    axa.set_ylabel(r'$\mu_{\alpha}$ (mas)')
 
-  plt.tight_layout()
+    axb.set_title('Declination vs. Proper Motion in Dec')
+    axb.set_xlabel(r'$\delta$ (deg)')
+    axb.set_ylabel(r'$\mu_{\delta}$ (mas)')
 
-  my_path = os.path.abspath('plots')
-  my_file = 'pos_vs_pms.pdf'
-  plt.savefig(os.path.join(my_path, my_file))
+    fig.suptitle(psr_name, fontsize=14)
+
+    plt.tight_layout()
+
+    my_path = os.path.abspath('plots')
+    my_file = 'pos_vs_pms.pdf'
+    plt.savefig(os.path.join(my_path, my_file))
 
 
 # get_matches('single_match_input.csv', 'actual_match.csv')
