@@ -92,6 +92,7 @@ def psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, height, width, radius)
         results.add_column(jname, name='Companion Pulsar', index=0)
         return results
 
+
 def get_matches(input_file, output_file, height=1., width=1., radius=1.):
     """Give Gaia matches to Pulsars 
 
@@ -102,7 +103,9 @@ def get_matches(input_file, output_file, height=1., width=1., radius=1.):
     Args: 
         input_file (str): Name of the text file (csv) containing each pulsar with the parameters 'index', 'jname', 
             'ra', 'dec', 'pmra', 'pmdec', 'posepoch' row by row for each object.
-        output_file (str): Name of the text file which the pulsar-gaia matches will be output to.
+        output_file (str): Name of the text file which the pulsar-gaia matches will be output to. If desired,
+            specify the full path to which the file should be saved, otherwise it will just be saved to the 
+            present working directory
         height (:obj:'float', optional): Height of the rectangle Gaia will query in.
         width (:obj:'float', optional): Width of the rectangle Gaia will query in.
         radius (:obj:'float', optional): Radius of the ractangle Gaia will query in. 
@@ -138,6 +141,7 @@ def get_matches(input_file, output_file, height=1., width=1., radius=1.):
 
     results.write(output_file, format='csv', overwrite=True)
     return skipped
+
 
 def check_binary(input_file, output_file):
     """Removes isolated pulsars from input file.
@@ -284,7 +288,7 @@ def check_in_globular(input_file, output_file):
         values = line.split(';')
         while len(values) - 1 > 7:
             values.pop()
-        g = open('gc_pulsar_names.csv', 'r')
+        g = open('/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/gc_pulsar_names.csv', 'r')
         for line in g:
             check = line.split()
             if values[1] == check[0]:
@@ -312,8 +316,8 @@ class TestBinaryCheck:
         all of the binary pulsars.
         """
 
-        input_file = 'e1_input.csv'
-        output_file = 'e1_output.csv'
+        input_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/binary_test/e1_input.csv'
+        output_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/binary_test/e1_output.csv'
         check_binary(input_file, output_file)
 
         count = 0
@@ -331,8 +335,8 @@ class TestPosUncertaintyCheck:
         uncertainty, the resulting output file has only 2 entries.
         """
 
-        input_file = 'e2_input.csv'
-        output_file = 'e2_output.csv'
+        input_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/pos_unc_test/e2_input.csv'
+        output_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/pos_unc_test/e2_output.csv'
         check_pos_uncertainty(input_file, output_file)
 
         count = 0
@@ -351,8 +355,8 @@ class TestInGlobularCheck:
         pulsars is created.
         """
 
-        input_file = 'e3_input.csv'
-        output_file = 'e3_output.csv'
+        input_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/globular_test/e3_input.csv'
+        output_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/globular_test/e3_output.csv'
 
         check_in_globular(input_file, output_file)
 
@@ -363,109 +367,73 @@ class TestInGlobularCheck:
 
         assert count == 2
 
+def matching_pipeline(input_file, output_file, no_pos, no_bin, no_glob, match_all_params, radius=1.):
+    """
+    
+    """
+    check_pos_uncertainty(input_file, no_pos)
+    check_binary(no_pos, no_bin)
+    check_in_globular(no_bin, no_glob)
+    get_matches(no_glob, match_all_params, radius= radius)
 
-# check_pos_uncertainty('initial_input.csv', 'i1.csv')
-# check_binary('i1.csv', 'i2.csv')
-# check_in_globular('i2.csv', 'almost_final.csv')
-# get_matches('almost_final.csv', 'final.csv')
+    # script to create an updated version of all_final.csv with only the parameters we wanna look at
 
-# check_pos_uncertainty('all_atnf.csv', 'a1.csv')
-# check_binary('a1.csv', 'a2.csv')
-# check_in_globular('a2.csv', 'all_almost_final.csv')
-# get_matches('all_almost_final.csv', 'all_final.csv')
+    c = open(match_all_params, 'r')
+    new = []
+    first_time = True
+    for line in c:
+        values = line.split(',')
+        values.pop(95)
+        count = 0 
+        while count < 40:
+            values.pop(91-count)
+            count += 1
+        index = 0
+        while index < 30:
+            values.pop(50-index)
+            index += 1
+        values.pop(12)
+        values.pop(5)
+        values.pop(4)
+        values.pop(2)
+        values.pop(1)
+        values.pop()
+        if first_time:
+            new.insert(0,values)
+            first_time = False
+        else:
+            new.append(values)
 
+    import csv
+    with open(output_file, 'w') as h:
+        write = csv.writer(h, delimiter=';')
+        write.writerows(new)
 
-# script to compare pmra and pmdec of the identified matches 
-# many of the confirmed literature matches do not have great agreement in their proper motions, so 
-# I realized narrowing them down that way is not particularly helpful...
+class TestMatchingPipeline:
 
-# a = open('all_final.csv', 'r') # read output file of get_mathces() that has pms of Gaia objects
-# first_time = True
-# new = []
-# top = True
+    def test_on_all_in_atnf_with_DR2(self):
+        """
+        Tests that the matching pipeline, wrapped into the function matching_pipeline(), returns the proper
+        set of gaia matches.
+        """
 
-# for line in a:
-#     values = line.split(',')
-#     if top:
-#         top = False
-#         continue
-#     b = open('all_almost_final.csv', 'r') # read input file of get_matches() that has pms of pulsars
-#     gaia_pmra = float(values[13])
-#     gaia_pmdec = float(values[15])
-#     for line in b:
-#         check = line.split(';')
-#         if values[0] == check[1]:
-#             psr_pmra = float(check[4])
-#             psr_pmdec = float(check[5])
-#             if int(gaia_pmra) == int(psr_pmra) and int(gaia_pmdec) == int(psr_pmdec):
-#                 values.pop()
-#                 if first_time:
-#                     new.insert(0,values)
-#                     first_time = False
-#                 else:
-#                     new.append(values)
+        input_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/all_atnf.csv'
+        output_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/matching_pipeline_test/t1_output.csv'
+        no_pos = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/matching_pipeline_test/t1_nopos.csv'
+        no_bin = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/matching_pipeline_test/t1_no_bin.csv'
+        no_glob = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/matching_pipeline_test/t1_noglob.csv'
+        match_all_params = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/matching_pipeline_test/t1_matchall.csv'
 
+        matching_pipeline(input_file, output_file, no_pos, no_bin, no_glob, match_all_params)
 
-# import csv
-# with open('all_binary_matches.csv', 'w') as h:
-#     write = csv.writer(h, delimiter=';')
-#     write.writerows(new)
+        f = open(output_file, 'r')
+        count = 0
+        for line in f:
+            count += 1
 
+        index = 0
+        g = open('/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/all_final_short.csv', 'r')
+        for line in g:
+            index += 1
 
-# script to create an updated version of all_final.csv with only the parameters we wanna look at
-
-c = open('all_final.csv', 'r')
-new = []
-first_time = True
-for line in c:
-    values = line.split(',')
-    values.pop(95)
-    count = 0 
-    while count < 40:
-        values.pop(91-count)
-        count += 1
-    index = 0
-    while index < 30:
-        values.pop(50-index)
-        index += 1
-    values.pop(12)
-    values.pop(5)
-    values.pop(4)
-    values.pop(2)
-    values.pop(1)
-    values.pop()
-    if first_time:
-        new.insert(0,values)
-        first_time = False
-    else:
-        new.append(values)
-
-import csv
-with open('all_final_short.csv', 'w') as h:
-    write = csv.writer(h, delimiter=';')
-    write.writerows(new)
-
-
-
-
-# script to make a csv of just the NAMES of the pulsars in Globular Clusters, from a file that had a lot
-# more info
-
-# import csv
-# import pandas as pd
-# j = open('gc_pulsars.csv','r')
-# keep = []
-# first_time = True
-# for line in j:
-#     values = line.split()
-#     if first_time:
-#         keep.insert(0,values[0])
-#     else:
-#         keep.append(values[0])
-
-# df = pd.DataFrame(keep)
-# df.to_csv('gc_pulsar_names.csv', index=False)
-
-# with open('gc_pulsar_names.csv', 'w') as g:
-#     write = csv.writer(g)
-#     write.writerows(keep)
+        assert count == index
