@@ -266,8 +266,8 @@ class TestGetMatches:
         important to the proper functionality of this test
         """
 
-        input_file = 'get_match_check_input.csv'
-        output_file = 'get_match_check_output.csv'
+        input_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/get_matches_test/get_match_check_input.csv'
+        output_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/get_matches_test/get_match_check_output.csv'
 
         get_matches(input_file, output_file)
 
@@ -292,8 +292,8 @@ class TestGetMatches:
         when only one pulsar is input, as does a direct Gaia query
         """
 
-        input_file = 'gm1_input.csv'
-        output_file = 'gm1_output.csv'
+        input_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/get_matches_test/gm1_input.csv'
+        output_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/get_matches_test/gm1_output.csv'
 
         get_matches(input_file, output_file)
 
@@ -302,7 +302,7 @@ class TestGetMatches:
         for line in f:
             count += 1
 
-        g = open('gm1_fromgaia_csv.csv', 'r')
+        g = open('/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/get_matches_test/gm1_fromgaia_csv.csv', 'r')
         index = 0
         for line in g:
             index += 1
@@ -315,8 +315,8 @@ class TestGetMatches:
         Test that a blank csv is returned when a blank csv is input by get_matches()
         """
         
-        input_file = 'gm2_input.csv'
-        output_file = 'gm2_output.csv'
+        input_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/get_matches_test/gm2_input.csv'
+        output_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/get_matches_test/gm2_output.csv'
 
         get_matches(input_file, output_file)
 
@@ -336,8 +336,8 @@ class TestGetMatches:
         that are incorrect
         """
 
-        input_file = 'gm3_input.csv'
-        output_file = 'gm3_output.csv'
+        input_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/get_matches_test/gm3_input.csv'
+        output_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/get_matches_test/gm3_output.csv'
 
         with pytest.raises(Exception):
             get_matches(input_file, output_file)
@@ -348,8 +348,8 @@ class TestGetMatches:
         Explores how get_matches() responds when objects with missing parameters are input
         """
 
-        input_file = 'gm4_input.csv'
-        output_file = 'gm4_output.csv'
+        input_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/get_matches_test/gm4_input.csv'
+        output_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/get_matches_test/gm4_output.csv'
 
         skipped = get_matches(input_file, output_file)
         
@@ -361,8 +361,8 @@ class TestGetMatches:
         those specified by get_matches() are included in the input text file
         """
 
-        input_file = 'gm5_input.csv'
-        output_file = 'gm5_output.csv'
+        input_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/get_matches_test/gm5_input.csv'
+        output_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/get_matches_test/gm5_output.csv'
 
         get_matches(input_file, output_file)
 
