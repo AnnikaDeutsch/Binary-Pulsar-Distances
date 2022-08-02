@@ -14,7 +14,7 @@ from astropy.io.votable import parse_single_table
 from astropy.time import Time
 import pytest
 
-def imoprting():
+def importing():
     """
     Imports every important package needed to run this package.
     """
@@ -31,6 +31,7 @@ def imoprting():
     import os
     from astropy.io.votable import parse_single_table
     from astropy.time import Time
+    import pytest
 
 # %%
 # inputs: ra, dec, height_of_rectangle, width_of_rectangle, radius_of_circle
@@ -123,7 +124,7 @@ def get_matches(input_file, output_file, height=1., width=1., radius=1.):
     matches of ra and dec to within a certain range.
 
     Args: 
-        input_file (str): Name of the text file (csv) containing each pulsar with the parameters 'index', 'name', 
+        input_file (str): Name of the text file (csv) containing each pulsar with the parameters 'index', 'jname', 
             'ra', 'dec', 'pmra', 'pmdec', 'posepoch' row by row for each object.
         output_file (str): Name of the text file which the pulsar-gaia matches will be output to.
         height (:obj:'float', optional): Height of the rectangle Gaia will query in.
@@ -137,12 +138,17 @@ def get_matches(input_file, output_file, height=1., width=1., radius=1.):
     f = open(input_file, "r")
     results = Table()
     first_time = True
+    skipped = 0
 
     # Loop through file of ATNF data and combine tables of Gaia matches into one supertable
     for line in f:
 
       # Parse input
       values = line.split(';')
+
+      if values[2] == '*' or values[3] == '*' or values[4] == '*' or values[5] == '*' or values[6] == '*':
+        skipped += 1
+        continue
 
       # Add result to supertable
       search_result = psr_to_gaia(values[1],values[2],values[3],values[4],values[5],values[6],height,width,radius)
@@ -155,6 +161,7 @@ def get_matches(input_file, output_file, height=1., width=1., radius=1.):
         results = vstack([results, search_result])
 
     results.write(output_file, format='csv', overwrite=True)
+    return skipped
 # %% [markdown]
 # Below is a number of unit tests on psr_to_gaia(), testing edge cases, cases that should throw an error, and 
 # that cases with already known outcomes return the correct values
@@ -336,14 +343,27 @@ class TestGetMatches:
             get_matches(input_file, output_file)
 
     
-    # def test_when_missing_input_params(self):
-    #     """
-    #     Explores how get_matches() responds when objects with missing parameters are input
-    #     """
+    def test_when_missing_input_params(self):
+        """
+        Explores how get_matches() responds when objects with missing parameters are input
+        """
 
-    #     input_file = 'gm4_input.csv'
-    #     output_file = 'gm4_output.csv'
+        input_file = 'gm4_input.csv'
+        output_file = 'gm4_output.csv'
 
-    #     get_matches(input_file, output_file)
+        skipped = get_matches(input_file, output_file)
+        
+        assert skipped == 9
+
+    def test_when_too_many_input_params(self):
+        """
+        Tests that get_matches() still functions when a text file with parameters beyond 
+        those specified by get_matches() are included in the input text file
+        """
+
+        input_file = 'gm5_input.csv'
+        output_file = 'gm5_output.csv'
+
+        get_matches(input_file, output_file)
 
 
