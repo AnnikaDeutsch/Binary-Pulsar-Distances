@@ -10,8 +10,7 @@ Welcome to Pulsar Companion Search's documentation!
    :maxdepth: 4
    :caption: Contents:
    
-   get_matches.rst
-   compare_equitorial.rst
+   eliminating.rst
 
 
 Indices and tables
