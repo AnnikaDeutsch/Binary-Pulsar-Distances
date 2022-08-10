@@ -2,7 +2,7 @@ from setuptools import setup # find_packages
 
 setup(
     
-    name="Binary_Pulsar_Distances",
+    name="psrmatch",
 
     version="1.0.0"
 
