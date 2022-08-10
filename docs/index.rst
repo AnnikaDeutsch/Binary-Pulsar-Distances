@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Pulsar Companion Search's documentation!
+Welcome to PSRmatch's documentation!
 ===================================================
 
 .. toctree::
