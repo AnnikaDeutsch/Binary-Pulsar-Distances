@@ -314,7 +314,7 @@ def check_in_globular(input_file, output_file):
         write.writerows(new)
 
 
-# now write this into a function to do it for any given pulsar
+
 def pretty_print(pulsar, source_id, filename, no_glob):
     """Prints attributes of the pulsar/match pair in a readable format.
 
@@ -370,65 +370,6 @@ def pretty_print(pulsar, source_id, filename, no_glob):
     g.close()
 
 
-class TestBinaryCheck:
-
-    def test_eliminates_all_not_binaries(self):
-        """
-        Tests that, given a small file with a known number of pulsars not in binaries,
-        the function check_binary() eliminates all of the isolated pulsars and keeps
-        all of the binary pulsars.
-        """
-
-        input_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/binary_test/e1_input.csv'
-        output_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/binary_test/e1_output.csv'
-        check_binary(input_file, output_file)
-
-        count = 0
-        f = open(output_file,'r')
-        for line in f:
-            count += 1
-
-        assert count == 2
-
-class TestPosUncertaintyCheck:
-
-    def test_pos_uncerainty_check(self):
-        """
-        Tests that, given a small file (e2_input.csv) with 2 acceptable and 2 unacceptable position
-        uncertainty, the resulting output file has only 2 entries.
-        """
-
-        input_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/pos_unc_test/e2_input.csv'
-        output_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/pos_unc_test/e2_output.csv'
-        check_pos_uncertainty(input_file, output_file)
-
-        count = 0
-        f = open(output_file,'r')
-        for line in f:
-            count += 1
-        
-        assert count == 2
-
-class TestInGlobularCheck:
-
-    def test_in_globular_check(self):
-        """
-        Tests that, given a file with 2 pulsars not in globular clusters and 1 pulsar in a 
-        globular cluster, the 1 pulsar in the globular is removed and a file with the 2 remaining 
-        pulsars is created.
-        """
-
-        input_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/globular_test/e3_input.csv'
-        output_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/globular_test/e3_output.csv'
-
-        check_in_globular(input_file, output_file)
-
-        count = 0
-        f = open(output_file, 'r')
-        for line in f:
-            count += 1
-
-        assert count == 2
 
 def matching_pipeline(input_file, output_file, no_pos, no_bin, no_glob, match_all_params, radius=1., 
                       pretty_print= False):
@@ -510,34 +451,7 @@ def matching_pipeline(input_file, output_file, no_pos, no_bin, no_glob, match_al
                 pretty_print(values[0], values[1], filename, no_glob)
 
 
-class TestMatchingPipeline:
 
-    def test_on_all_in_atnf_with_DR2(self):
-        """
-        Tests that the matching pipeline, wrapped into the function matching_pipeline(), returns the proper
-        set of gaia matches.
-        """
-
-        input_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/all_atnf.csv'
-        output_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/matching_pipeline_test/t1_output.csv'
-        no_pos = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/matching_pipeline_test/t1_nopos.csv'
-        no_bin = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/matching_pipeline_test/t1_no_bin.csv'
-        no_glob = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/matching_pipeline_test/t1_noglob.csv'
-        match_all_params = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/matching_pipeline_test/t1_matchall.csv'
-
-        matching_pipeline(input_file, output_file, no_pos, no_bin, no_glob, match_all_params)
-
-        f = open(output_file, 'r')
-        count = 0
-        for line in f:
-            count += 1
-
-        index = 0
-        g = open('/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/all_final_short.csv', 'r')
-        for line in g:
-            index += 1
-
-        assert count == index
 
 
 
