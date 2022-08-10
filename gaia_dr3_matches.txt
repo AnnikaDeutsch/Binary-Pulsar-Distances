@@ -1,0 +1,1632 @@
+PSR JNAME: J0024-7204U
+
+----Gaia Match Attributes----
+Gaia Source ID: 4689639472995311744
+Gaia PMRA: -- mas/yr
+Gaia PMDEC: -- mas/yr
+Gaia Parallax: -- ± -- mas
+Gaia G-band-mag: 16.876486
+
+----Pulsar Attributes----
+ATNF DM: 24.337
+pc / cm^{3}
+ATNF PMRA: 4.6 ± 2.0e-01 mas/yr
+ATNF PMDEC: -3.8 ± 24.337
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J0337+1715
+
+----Gaia Match Attributes----
+Gaia Source ID: 44308738051547264
+Gaia PMRA: 5.480495136987953 mas/yr
+Gaia PMDEC: -4.427292334782167 mas/yr
+Gaia Parallax: 0.5416920661382117 ± 0.19513616 mas
+Gaia G-band-mag: 18.0523
+
+----Pulsar Attributes----
+ATNF DM: 21.3162
+pc / cm^{3}
+ATNF PMRA: 4.81 ± 4.9e-01 mas/yr
+ATNF PMDEC: -4.42 ± 21.3162
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J0348+0432
+
+----Gaia Match Attributes----
+Gaia Source ID: 3273288485744249344
+Gaia PMRA: 3.4381852148165697 mas/yr
+Gaia PMDEC: -0.22602818895594637 mas/yr
+Gaia Parallax: -0.03510799409612238 ± 0.78409487 mas
+Gaia G-band-mag: 20.58892
+
+----Pulsar Attributes----
+ATNF DM: 40.46313
+pc / cm^{3}
+ATNF PMRA: +4.04 ± 1.6e-01 mas/yr
+ATNF PMDEC: +3.5 ± 40.46313
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1012+5307
+
+----Gaia Match Attributes----
+Gaia Source ID: 851610861391010944
+Gaia PMRA: 2.7364450992406075 mas/yr
+Gaia PMDEC: -25.921120753058773 mas/yr
+Gaia Parallax: 1.7447569177332496 ± 0.29057664 mas
+Gaia G-band-mag: 19.586607
+
+----Pulsar Attributes----
+ATNF DM: 9.022146
+pc / cm^{3}
+ATNF PMRA: 2.64 ± 3.2e-02 mas/yr
+ATNF PMDEC: -25.54 ± 9.022146
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1023+0038
+
+----Gaia Match Attributes----
+Gaia Source ID: 3831382647922429952
+Gaia PMRA: 4.609895324338583 mas/yr
+Gaia PMDEC: -17.281024260717615 mas/yr
+Gaia Parallax: 0.6861708101572905 ± 0.07056036 mas
+Gaia G-band-mag: 16.232056
+
+----Pulsar Attributes----
+ATNF DM: 14.325
+pc / cm^{3}
+ATNF PMRA: 4.76 ± 3.0e-02 mas/yr
+ATNF PMDEC: -17.34 ± 14.325
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1125-6014
+
+----Gaia Match Attributes----
+Gaia Source ID: 5336020987242787328
+Gaia PMRA: -6.272741505193303 mas/yr
+Gaia PMDEC: 1.0720498229361572 mas/yr
+Gaia Parallax: 0.23567878337619225 ± 0.39101517 mas
+Gaia G-band-mag: 19.809261
+
+----Pulsar Attributes----
+ATNF DM: 52.9303
+pc / cm^{3}
+ATNF PMRA: 11.106 ± 1.4e-02 mas/yr
+ATNF PMDEC: -13.038 ± 52.9303
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1302-6350
+
+----Gaia Match Attributes----
+Gaia Source ID: 5862299960127967488
+Gaia PMRA: -7.092820662863646 mas/yr
+Gaia PMDEC: -0.34195092640087815 mas/yr
+Gaia Parallax: 0.44344477764993895 ± 0.013309076 mas
+Gaia G-band-mag: 9.632835
+
+----Pulsar Attributes----
+ATNF DM: 146.73
+pc / cm^{3}
+ATNF PMRA: -7.01 ± 3.0e-02 mas/yr
+ATNF PMDEC: -0.53 ± 146.73
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1417-4402
+
+----Gaia Match Attributes----
+Gaia Source ID: 6096705840454620800
+Gaia PMRA: -4.763750208392074 mas/yr
+Gaia PMDEC: -5.103216631918363 mas/yr
+Gaia Parallax: 0.19737278858599186 ± 0.047102146 mas
+Gaia G-band-mag: 15.771324
+
+----Pulsar Attributes----
+ATNF DM: 55.00
+pc / cm^{3}
+ATNF PMRA: -4.70 ± 1.0e-01 mas/yr
+ATNF PMDEC: -5.10 ± 55.00
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1723-2837
+
+----Gaia Match Attributes----
+Gaia Source ID: 4059795678905878528
+Gaia PMRA: -- mas/yr
+Gaia PMDEC: -- mas/yr
+Gaia Parallax: -- ± -- mas
+Gaia G-band-mag: 20.644478
+
+----Pulsar Attributes----
+ATNF DM: 19.688
+pc / cm^{3}
+ATNF PMRA: -11.713 ± 8.2e-02 mas/yr
+ATNF PMDEC: -23.990 ± 19.688
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1751-2857
+
+----Gaia Match Attributes----
+Gaia Source ID: 4057347444388501120
+Gaia PMRA: -- mas/yr
+Gaia PMDEC: -- mas/yr
+Gaia Parallax: -- ± -- mas
+Gaia G-band-mag: 20.995537
+
+----Pulsar Attributes----
+ATNF DM: 42.84
+pc / cm^{3}
+ATNF PMRA: -7.4 ± 1.0e-01 mas/yr
+ATNF PMDEC: -4.3 ± 42.84
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1801-3210
+
+----Gaia Match Attributes----
+Gaia Source ID: 4043712194647392128
+Gaia PMRA: -- mas/yr
+Gaia PMDEC: -- mas/yr
+Gaia Parallax: -- ± -- mas
+Gaia G-band-mag: 20.169302
+
+----Pulsar Attributes----
+ATNF DM: 177.713
+pc / cm^{3}
+ATNF PMRA: -4.0 ± 6.0e-01 mas/yr
+ATNF PMDEC: -4 ± 177.713
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1816+4510
+
+----Gaia Match Attributes----
+Gaia Source ID: 2115337192179377792
+Gaia PMRA: -0.05861630575280602 mas/yr
+Gaia PMDEC: -4.399506732960086 mas/yr
+Gaia Parallax: 0.22249783718568827 ± 0.101308666 mas
+Gaia G-band-mag: 18.195118
+
+----Pulsar Attributes----
+ATNF DM: 38.8874
+pc / cm^{3}
+ATNF PMRA: 5.3 ± 8.0e-01 mas/yr
+ATNF PMDEC: -3 ± 38.8874
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1910+1256
+
+----Gaia Match Attributes----
+Gaia Source ID: 4314046781982561920
+Gaia PMRA: -2.2518595290800283 mas/yr
+Gaia PMDEC: -6.090315406261422 mas/yr
+Gaia Parallax: -0.09600973820458453 ± 0.8472586 mas
+Gaia G-band-mag: 20.344213
+
+----Pulsar Attributes----
+ATNF DM: 38.067848
+pc / cm^{3}
+ATNF PMRA: 0.26 ± 3.1e-02 mas/yr
+ATNF PMDEC: -7.14 ± 38.067848
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1946+3417
+
+----Gaia Match Attributes----
+Gaia Source ID: 2047074979178939648
+Gaia PMRA: -0.8121277480248992 mas/yr
+Gaia PMDEC: -5.315792599592822 mas/yr
+Gaia Parallax: 3.1428273931673494 ± 0.8389677 mas
+Gaia G-band-mag: 20.180588
+
+----Pulsar Attributes----
+ATNF DM: 110.178388
+pc / cm^{3}
+ATNF PMRA: -7.68 ± 1.2e-01 mas/yr
+ATNF PMDEC: 4.58 ± 110.178388
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1955+2908
+
+----Gaia Match Attributes----
+Gaia Source ID: 2028584968839606784
+Gaia PMRA: -3.1673756465389253 mas/yr
+Gaia PMDEC: -7.826567155396902 mas/yr
+Gaia Parallax: 0.4748712032006062 ± 0.16951662 mas
+Gaia G-band-mag: 18.672125
+
+----Pulsar Attributes----
+ATNF DM: 104.516916
+pc / cm^{3}
+ATNF PMRA: -0.98 ± 5.1e-02 mas/yr
+ATNF PMDEC: -4.05 ± 104.516916
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J2032+4127
+
+----Gaia Match Attributes----
+Gaia Source ID: 2067835682818358400
+Gaia PMRA: -2.8762382942769733 mas/yr
+Gaia PMDEC: -0.9478946506888151 mas/yr
+Gaia Parallax: 0.5677534793686149 ± 0.015594214 mas
+Gaia G-band-mag: 11.277184
+
+----Pulsar Attributes----
+ATNF DM: 114.67
+pc / cm^{3}
+ATNF PMRA: -2.991 ± 4.8e-02 mas/yr
+ATNF PMDEC: -0.742 ± 114.67
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J2039-5617
+
+----Gaia Match Attributes----
+Gaia Source ID: 6469722508861870080
+Gaia PMRA: 3.861062488612513 mas/yr
+Gaia PMDEC: -15.179687664578143 mas/yr
+Gaia Parallax: 0.4886902269612317 ± 0.165951 mas
+Gaia G-band-mag: 18.516928
+
+----Pulsar Attributes----
+ATNF DM: 24.57
+pc / cm^{3}
+ATNF PMRA: 4.2 ± 3.0e-01 mas/yr
+ATNF PMDEC: -14.9 ± 24.57
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J2339-0533
+
+----Gaia Match Attributes----
+Gaia Source ID: 2440660623886405504
+Gaia PMRA: 3.923657379993803 mas/yr
+Gaia PMDEC: -10.279614780241074 mas/yr
+Gaia Parallax: 0.5346435911756503 ± 0.18320292 mas
+Gaia G-band-mag: 18.797928
+
+----Pulsar Attributes----
+ATNF DM: 8.717
+pc / cm^{3}
+ATNF PMRA: 4.15 ± 4.8e-01 mas/yr
+ATNF PMDEC: -10.31 ± 8.717
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J0024-7204U
+
+----Gaia Match Attributes----
+Gaia Source ID: 4689639472995311744
+Gaia PMRA: -- mas/yr
+Gaia PMDEC: -- mas/yr
+Gaia Parallax: -- ± -- mas
+Gaia G-band-mag: 16.876486
+
+----Pulsar Attributes----
+ATNF DM: 24.337
+pc / cm^{3}
+ATNF PMRA: 4.6 ± 2.0e-01 mas/yr
+ATNF PMDEC: -3.8 ± 24.337
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J0337+1715
+
+----Gaia Match Attributes----
+Gaia Source ID: 44308738051547264
+Gaia PMRA: 5.480495136987953 mas/yr
+Gaia PMDEC: -4.427292334782167 mas/yr
+Gaia Parallax: 0.5416920661382117 ± 0.19513616 mas
+Gaia G-band-mag: 18.0523
+
+----Pulsar Attributes----
+ATNF DM: 21.3162
+pc / cm^{3}
+ATNF PMRA: 4.81 ± 4.9e-01 mas/yr
+ATNF PMDEC: -4.42 ± 21.3162
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J0348+0432
+
+----Gaia Match Attributes----
+Gaia Source ID: 3273288485744249344
+Gaia PMRA: 3.4381852148165697 mas/yr
+Gaia PMDEC: -0.22602818895594637 mas/yr
+Gaia Parallax: -0.03510799409612238 ± 0.78409487 mas
+Gaia G-band-mag: 20.58892
+
+----Pulsar Attributes----
+ATNF DM: 40.46313
+pc / cm^{3}
+ATNF PMRA: +4.04 ± 1.6e-01 mas/yr
+ATNF PMDEC: +3.5 ± 40.46313
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1012+5307
+
+----Gaia Match Attributes----
+Gaia Source ID: 851610861391010944
+Gaia PMRA: 2.7364450992406075 mas/yr
+Gaia PMDEC: -25.921120753058773 mas/yr
+Gaia Parallax: 1.7447569177332496 ± 0.29057664 mas
+Gaia G-band-mag: 19.586607
+
+----Pulsar Attributes----
+ATNF DM: 9.022146
+pc / cm^{3}
+ATNF PMRA: 2.64 ± 3.2e-02 mas/yr
+ATNF PMDEC: -25.54 ± 9.022146
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1023+0038
+
+----Gaia Match Attributes----
+Gaia Source ID: 3831382647922429952
+Gaia PMRA: 4.609895324338583 mas/yr
+Gaia PMDEC: -17.281024260717615 mas/yr
+Gaia Parallax: 0.6861708101572905 ± 0.07056036 mas
+Gaia G-band-mag: 16.232056
+
+----Pulsar Attributes----
+ATNF DM: 14.325
+pc / cm^{3}
+ATNF PMRA: 4.76 ± 3.0e-02 mas/yr
+ATNF PMDEC: -17.34 ± 14.325
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1125-6014
+
+----Gaia Match Attributes----
+Gaia Source ID: 5336020987242787328
+Gaia PMRA: -6.272741505193303 mas/yr
+Gaia PMDEC: 1.0720498229361572 mas/yr
+Gaia Parallax: 0.23567878337619225 ± 0.39101517 mas
+Gaia G-band-mag: 19.809261
+
+----Pulsar Attributes----
+ATNF DM: 52.9303
+pc / cm^{3}
+ATNF PMRA: 11.106 ± 1.4e-02 mas/yr
+ATNF PMDEC: -13.038 ± 52.9303
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1302-6350
+
+----Gaia Match Attributes----
+Gaia Source ID: 5862299960127967488
+Gaia PMRA: -7.092820662863646 mas/yr
+Gaia PMDEC: -0.34195092640087815 mas/yr
+Gaia Parallax: 0.44344477764993895 ± 0.013309076 mas
+Gaia G-band-mag: 9.632835
+
+----Pulsar Attributes----
+ATNF DM: 146.73
+pc / cm^{3}
+ATNF PMRA: -7.01 ± 3.0e-02 mas/yr
+ATNF PMDEC: -0.53 ± 146.73
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1417-4402
+
+----Gaia Match Attributes----
+Gaia Source ID: 6096705840454620800
+Gaia PMRA: -4.763750208392074 mas/yr
+Gaia PMDEC: -5.103216631918363 mas/yr
+Gaia Parallax: 0.19737278858599186 ± 0.047102146 mas
+Gaia G-band-mag: 15.771324
+
+----Pulsar Attributes----
+ATNF DM: 55.00
+pc / cm^{3}
+ATNF PMRA: -4.70 ± 1.0e-01 mas/yr
+ATNF PMDEC: -5.10 ± 55.00
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1723-2837
+
+----Gaia Match Attributes----
+Gaia Source ID: 4059795678905878528
+Gaia PMRA: -- mas/yr
+Gaia PMDEC: -- mas/yr
+Gaia Parallax: -- ± -- mas
+Gaia G-band-mag: 20.644478
+
+----Pulsar Attributes----
+ATNF DM: 19.688
+pc / cm^{3}
+ATNF PMRA: -11.713 ± 8.2e-02 mas/yr
+ATNF PMDEC: -23.990 ± 19.688
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1751-2857
+
+----Gaia Match Attributes----
+Gaia Source ID: 4057347444388501120
+Gaia PMRA: -- mas/yr
+Gaia PMDEC: -- mas/yr
+Gaia Parallax: -- ± -- mas
+Gaia G-band-mag: 20.995537
+
+----Pulsar Attributes----
+ATNF DM: 42.84
+pc / cm^{3}
+ATNF PMRA: -7.4 ± 1.0e-01 mas/yr
+ATNF PMDEC: -4.3 ± 42.84
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1801-3210
+
+----Gaia Match Attributes----
+Gaia Source ID: 4043712194647392128
+Gaia PMRA: -- mas/yr
+Gaia PMDEC: -- mas/yr
+Gaia Parallax: -- ± -- mas
+Gaia G-band-mag: 20.169302
+
+----Pulsar Attributes----
+ATNF DM: 177.713
+pc / cm^{3}
+ATNF PMRA: -4.0 ± 6.0e-01 mas/yr
+ATNF PMDEC: -4 ± 177.713
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1816+4510
+
+----Gaia Match Attributes----
+Gaia Source ID: 2115337192179377792
+Gaia PMRA: -0.05861630575280602 mas/yr
+Gaia PMDEC: -4.399506732960086 mas/yr
+Gaia Parallax: 0.22249783718568827 ± 0.101308666 mas
+Gaia G-band-mag: 18.195118
+
+----Pulsar Attributes----
+ATNF DM: 38.8874
+pc / cm^{3}
+ATNF PMRA: 5.3 ± 8.0e-01 mas/yr
+ATNF PMDEC: -3 ± 38.8874
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1910+1256
+
+----Gaia Match Attributes----
+Gaia Source ID: 4314046781982561920
+Gaia PMRA: -2.2518595290800283 mas/yr
+Gaia PMDEC: -6.090315406261422 mas/yr
+Gaia Parallax: -0.09600973820458453 ± 0.8472586 mas
+Gaia G-band-mag: 20.344213
+
+----Pulsar Attributes----
+ATNF DM: 38.067848
+pc / cm^{3}
+ATNF PMRA: 0.26 ± 3.1e-02 mas/yr
+ATNF PMDEC: -7.14 ± 38.067848
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1946+3417
+
+----Gaia Match Attributes----
+Gaia Source ID: 2047074979178939648
+Gaia PMRA: -0.8121277480248992 mas/yr
+Gaia PMDEC: -5.315792599592822 mas/yr
+Gaia Parallax: 3.1428273931673494 ± 0.8389677 mas
+Gaia G-band-mag: 20.180588
+
+----Pulsar Attributes----
+ATNF DM: 110.178388
+pc / cm^{3}
+ATNF PMRA: -7.68 ± 1.2e-01 mas/yr
+ATNF PMDEC: 4.58 ± 110.178388
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1955+2908
+
+----Gaia Match Attributes----
+Gaia Source ID: 2028584968839606784
+Gaia PMRA: -3.1673756465389253 mas/yr
+Gaia PMDEC: -7.826567155396902 mas/yr
+Gaia Parallax: 0.4748712032006062 ± 0.16951662 mas
+Gaia G-band-mag: 18.672125
+
+----Pulsar Attributes----
+ATNF DM: 104.516916
+pc / cm^{3}
+ATNF PMRA: -0.98 ± 5.1e-02 mas/yr
+ATNF PMDEC: -4.05 ± 104.516916
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J2032+4127
+
+----Gaia Match Attributes----
+Gaia Source ID: 2067835682818358400
+Gaia PMRA: -2.8762382942769733 mas/yr
+Gaia PMDEC: -0.9478946506888151 mas/yr
+Gaia Parallax: 0.5677534793686149 ± 0.015594214 mas
+Gaia G-band-mag: 11.277184
+
+----Pulsar Attributes----
+ATNF DM: 114.67
+pc / cm^{3}
+ATNF PMRA: -2.991 ± 4.8e-02 mas/yr
+ATNF PMDEC: -0.742 ± 114.67
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J2039-5617
+
+----Gaia Match Attributes----
+Gaia Source ID: 6469722508861870080
+Gaia PMRA: 3.861062488612513 mas/yr
+Gaia PMDEC: -15.179687664578143 mas/yr
+Gaia Parallax: 0.4886902269612317 ± 0.165951 mas
+Gaia G-band-mag: 18.516928
+
+----Pulsar Attributes----
+ATNF DM: 24.57
+pc / cm^{3}
+ATNF PMRA: 4.2 ± 3.0e-01 mas/yr
+ATNF PMDEC: -14.9 ± 24.57
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J2339-0533
+
+----Gaia Match Attributes----
+Gaia Source ID: 2440660623886405504
+Gaia PMRA: 3.923657379993803 mas/yr
+Gaia PMDEC: -10.279614780241074 mas/yr
+Gaia Parallax: 0.5346435911756503 ± 0.18320292 mas
+Gaia G-band-mag: 18.797928
+
+----Pulsar Attributes----
+ATNF DM: 8.717
+pc / cm^{3}
+ATNF PMRA: 4.15 ± 4.8e-01 mas/yr
+ATNF PMDEC: -10.31 ± 8.717
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J0024-7204U
+
+----Gaia Match Attributes----
+Gaia Source ID: 4689639472995311744
+Gaia PMRA: -- mas/yr
+Gaia PMDEC: -- mas/yr
+Gaia Parallax: -- ± -- mas
+Gaia G-band-mag: 16.876486
+
+----Pulsar Attributes----
+ATNF DM: 24.337
+pc / cm^{3}
+ATNF PMRA: 4.6 ± 2.0e-01 mas/yr
+ATNF PMDEC: -3.8 ± 24.337
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J0337+1715
+
+----Gaia Match Attributes----
+Gaia Source ID: 44308738051547264
+Gaia PMRA: 5.480495136987953 mas/yr
+Gaia PMDEC: -4.427292334782167 mas/yr
+Gaia Parallax: 0.5416920661382117 ± 0.19513616 mas
+Gaia G-band-mag: 18.0523
+
+----Pulsar Attributes----
+ATNF DM: 21.3162
+pc / cm^{3}
+ATNF PMRA: 4.81 ± 4.9e-01 mas/yr
+ATNF PMDEC: -4.42 ± 21.3162
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J0348+0432
+
+----Gaia Match Attributes----
+Gaia Source ID: 3273288485744249344
+Gaia PMRA: 3.4381852148165697 mas/yr
+Gaia PMDEC: -0.22602818895594637 mas/yr
+Gaia Parallax: -0.03510799409612238 ± 0.78409487 mas
+Gaia G-band-mag: 20.58892
+
+----Pulsar Attributes----
+ATNF DM: 40.46313
+pc / cm^{3}
+ATNF PMRA: +4.04 ± 1.6e-01 mas/yr
+ATNF PMDEC: +3.5 ± 40.46313
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1012+5307
+
+----Gaia Match Attributes----
+Gaia Source ID: 851610861391010944
+Gaia PMRA: 2.7364450992406075 mas/yr
+Gaia PMDEC: -25.921120753058773 mas/yr
+Gaia Parallax: 1.7447569177332496 ± 0.29057664 mas
+Gaia G-band-mag: 19.586607
+
+----Pulsar Attributes----
+ATNF DM: 9.022146
+pc / cm^{3}
+ATNF PMRA: 2.64 ± 3.2e-02 mas/yr
+ATNF PMDEC: -25.54 ± 9.022146
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1023+0038
+
+----Gaia Match Attributes----
+Gaia Source ID: 3831382647922429952
+Gaia PMRA: 4.609895324338583 mas/yr
+Gaia PMDEC: -17.281024260717615 mas/yr
+Gaia Parallax: 0.6861708101572905 ± 0.07056036 mas
+Gaia G-band-mag: 16.232056
+
+----Pulsar Attributes----
+ATNF DM: 14.325
+pc / cm^{3}
+ATNF PMRA: 4.76 ± 3.0e-02 mas/yr
+ATNF PMDEC: -17.34 ± 14.325
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1048+2339
+
+----Gaia Match Attributes----
+Gaia Source ID: 3990037124929068032
+Gaia PMRA: -15.445225592727764 mas/yr
+Gaia PMDEC: -11.614618303913119 mas/yr
+Gaia Parallax: 0.48692630852515645 ± 0.4369539 mas
+Gaia G-band-mag: 19.59331
+
+----Pulsar Attributes----
+ATNF DM: 16.6544
+pc / cm^{3}
+ATNF PMRA: -18.7 ± 3.0e+00 mas/yr
+ATNF PMDEC: -9.4 ± 16.6544
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1125-6014
+
+----Gaia Match Attributes----
+Gaia Source ID: 5336020987242787328
+Gaia PMRA: -6.272741505193303 mas/yr
+Gaia PMDEC: 1.0720498229361572 mas/yr
+Gaia Parallax: 0.23567878337619225 ± 0.39101517 mas
+Gaia G-band-mag: 19.809261
+
+----Pulsar Attributes----
+ATNF DM: 52.9303
+pc / cm^{3}
+ATNF PMRA: 11.106 ± 1.4e-02 mas/yr
+ATNF PMDEC: -13.038 ± 52.9303
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1227-4853
+
+----Gaia Match Attributes----
+Gaia Source ID: 6128369984328414336
+Gaia PMRA: -18.77239526564296 mas/yr
+Gaia PMDEC: 7.297369719202052 mas/yr
+Gaia Parallax: 0.4635009727807662 ± 0.12760405 mas
+Gaia G-band-mag: 18.070656
+
+----Pulsar Attributes----
+ATNF DM: 43.4235
+pc / cm^{3}
+ATNF PMRA: -18.73 ± 2.0e-01 mas/yr
+ATNF PMDEC: 7.39 ± 43.4235
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1302-6350
+
+----Gaia Match Attributes----
+Gaia Source ID: 5862299960127967488
+Gaia PMRA: -7.092820662863646 mas/yr
+Gaia PMDEC: -0.34195092640087815 mas/yr
+Gaia Parallax: 0.44344477764993895 ± 0.013309076 mas
+Gaia G-band-mag: 9.632835
+
+----Pulsar Attributes----
+ATNF DM: 146.73
+pc / cm^{3}
+ATNF PMRA: -7.01 ± 3.0e-02 mas/yr
+ATNF PMDEC: -0.53 ± 146.73
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1417-4402
+
+----Gaia Match Attributes----
+Gaia Source ID: 6096705840454620800
+Gaia PMRA: -4.763750208392074 mas/yr
+Gaia PMDEC: -5.103216631918363 mas/yr
+Gaia Parallax: 0.19737278858599186 ± 0.047102146 mas
+Gaia G-band-mag: 15.771324
+
+----Pulsar Attributes----
+ATNF DM: 55.00
+pc / cm^{3}
+ATNF PMRA: -4.70 ± 1.0e-01 mas/yr
+ATNF PMDEC: -5.10 ± 55.00
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1431-4715
+
+----Gaia Match Attributes----
+Gaia Source ID: 6098156298150016768
+Gaia PMRA: -11.82466167772455 mas/yr
+Gaia PMDEC: -14.51887237227252 mas/yr
+Gaia Parallax: 0.5264374882064711 ± 0.12626342 mas
+Gaia G-band-mag: 17.728407
+
+----Pulsar Attributes----
+ATNF DM: 59.35
+pc / cm^{3}
+ATNF PMRA: -12.01 ± 3.3e-01 mas/yr
+ATNF PMDEC: 14.51 ± 59.35
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1536-4948
+
+----Gaia Match Attributes----
+Gaia Source ID: 5985598266373074048
+Gaia PMRA: -7.4752752989006765 mas/yr
+Gaia PMDEC: -4.587162448230824 mas/yr
+Gaia Parallax: 0.07914602889891219 ± 0.041100707 mas
+Gaia G-band-mag: 16.08151
+
+----Pulsar Attributes----
+ATNF DM: 38.00125
+pc / cm^{3}
+ATNF PMRA: -7.3 ± 2.0e-01 mas/yr
+ATNF PMDEC: -2.7 ± 38.00125
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1543-5149
+
+----Gaia Match Attributes----
+Gaia Source ID: 5886130706451776256
+Gaia PMRA: -3.2709659300363647 mas/yr
+Gaia PMDEC: -2.6346374316668673 mas/yr
+Gaia Parallax: -0.017828687607129114 ± 0.28262383 mas
+Gaia G-band-mag: 19.125446
+
+----Pulsar Attributes----
+ATNF DM: 50.93
+pc / cm^{3}
+ATNF PMRA: -4.3 ± 1.4e+00 mas/yr
+ATNF PMDEC: -4 ± 50.93
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1622-0315
+
+----Gaia Match Attributes----
+Gaia Source ID: 4358428942492430336
+Gaia PMRA: -13.184256042621108 mas/yr
+Gaia PMDEC: 2.2978893193596313 mas/yr
+Gaia Parallax: 0.6239454758607961 ± 0.30268377 mas
+Gaia G-band-mag: 19.206276
+
+----Pulsar Attributes----
+ATNF DM: 21.4
+pc / cm^{3}
+ATNF PMRA: -15.4 ± 1.7e+00 mas/yr
+ATNF PMDEC: 37.5 ± 21.4
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1653-0158
+
+----Gaia Match Attributes----
+Gaia Source ID: 4379227476242700928
+Gaia PMRA: -17.304379389093413 mas/yr
+Gaia PMDEC: -3.242383098648619 mas/yr
+Gaia Parallax: 1.7723741981979495 ± 0.775199 mas
+Gaia G-band-mag: 20.447805
+
+----Pulsar Attributes----
+ATNF DM: *
+pc / cm^{3}
+ATNF PMRA: -19.62 ± 1.9e+00 mas/yr
+ATNF PMDEC: -3.74 ± *
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1723-2837
+
+----Gaia Match Attributes----
+Gaia Source ID: 4059795674516044800
+Gaia PMRA: -11.73376052135494 mas/yr
+Gaia PMDEC: -24.049698930825514 mas/yr
+Gaia Parallax: 1.0663413131826731 ± 0.043885317 mas
+Gaia G-band-mag: 15.540544
+
+----Pulsar Attributes----
+ATNF DM: 19.688
+pc / cm^{3}
+ATNF PMRA: -11.713 ± 8.2e-02 mas/yr
+ATNF PMDEC: -23.990 ± 19.688
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1751-2857
+
+----Gaia Match Attributes----
+Gaia Source ID: 4057347444388501120
+Gaia PMRA: -- mas/yr
+Gaia PMDEC: -- mas/yr
+Gaia Parallax: -- ± -- mas
+Gaia G-band-mag: 20.995537
+
+----Pulsar Attributes----
+ATNF DM: 42.84
+pc / cm^{3}
+ATNF PMRA: -7.4 ± 1.0e-01 mas/yr
+ATNF PMDEC: -4.3 ± 42.84
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1816+4510
+
+----Gaia Match Attributes----
+Gaia Source ID: 2115337192179377792
+Gaia PMRA: -0.05861630575280602 mas/yr
+Gaia PMDEC: -4.399506732960086 mas/yr
+Gaia Parallax: 0.22249783718568827 ± 0.101308666 mas
+Gaia G-band-mag: 18.195118
+
+----Pulsar Attributes----
+ATNF DM: 38.8874
+pc / cm^{3}
+ATNF PMRA: 5.3 ± 8.0e-01 mas/yr
+ATNF PMDEC: -3 ± 38.8874
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1955+2908
+
+----Gaia Match Attributes----
+Gaia Source ID: 2028584968839606784
+Gaia PMRA: -3.1673756465389253 mas/yr
+Gaia PMDEC: -7.826567155396902 mas/yr
+Gaia Parallax: 0.4748712032006062 ± 0.16951662 mas
+Gaia G-band-mag: 18.672125
+
+----Pulsar Attributes----
+ATNF DM: 104.516916
+pc / cm^{3}
+ATNF PMRA: -0.98 ± 5.1e-02 mas/yr
+ATNF PMDEC: -4.05 ± 104.516916
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1959+2048
+
+----Gaia Match Attributes----
+Gaia Source ID: 1823773960079217024
+Gaia PMRA: -1.8216110121041753 mas/yr
+Gaia PMDEC: -5.0101456261641975 mas/yr
+Gaia Parallax: 0.700183134198985 ± 0.52509254 mas
+Gaia G-band-mag: 20.298357
+
+----Pulsar Attributes----
+ATNF DM: 29.1168
+pc / cm^{3}
+ATNF PMRA: -16.0 ± 5.0e-01 mas/yr
+ATNF PMDEC: -25.8 ± 29.1168
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1959+2048
+
+----Gaia Match Attributes----
+Gaia Source ID: 1823773960079216896
+Gaia PMRA: -19.26711160401061 mas/yr
+Gaia PMDEC: -26.559995169426703 mas/yr
+Gaia Parallax: 1.1877899664919966 ± 1.3556207 mas
+Gaia G-band-mag: 20.176073
+
+----Pulsar Attributes----
+ATNF DM: 29.1168
+pc / cm^{3}
+ATNF PMRA: -16.0 ± 5.0e-01 mas/yr
+ATNF PMDEC: -25.8 ± 29.1168
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J2032+4127
+
+----Gaia Match Attributes----
+Gaia Source ID: 2067835682818358400
+Gaia PMRA: -2.8762382942769733 mas/yr
+Gaia PMDEC: -0.9478946506888151 mas/yr
+Gaia Parallax: 0.5677534793686149 ± 0.015594214 mas
+Gaia G-band-mag: 11.277184
+
+----Pulsar Attributes----
+ATNF DM: 114.67
+pc / cm^{3}
+ATNF PMRA: -2.991 ± 4.8e-02 mas/yr
+ATNF PMDEC: -0.742 ± 114.67
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J2039-5617
+
+----Gaia Match Attributes----
+Gaia Source ID: 6469722508861870080
+Gaia PMRA: 3.861062488612513 mas/yr
+Gaia PMDEC: -15.179687664578143 mas/yr
+Gaia Parallax: 0.4886902269612317 ± 0.165951 mas
+Gaia G-band-mag: 18.516928
+
+----Pulsar Attributes----
+ATNF DM: 24.57
+pc / cm^{3}
+ATNF PMRA: 4.2 ± 3.0e-01 mas/yr
+ATNF PMDEC: -14.9 ± 24.57
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J2339-0533
+
+----Gaia Match Attributes----
+Gaia Source ID: 2440660623886405504
+Gaia PMRA: 3.923657379993803 mas/yr
+Gaia PMDEC: -10.279614780241074 mas/yr
+Gaia Parallax: 0.5346435911756503 ± 0.18320292 mas
+Gaia G-band-mag: 18.797928
+
+----Pulsar Attributes----
+ATNF DM: 8.717
+pc / cm^{3}
+ATNF PMRA: 4.15 ± 4.8e-01 mas/yr
+ATNF PMDEC: -10.31 ± 8.717
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J0024-7204U
+
+----Gaia Match Attributes----
+Gaia Source ID: 4689639472995311744
+Gaia PMRA: -- mas/yr
+Gaia PMDEC: -- mas/yr
+Gaia Parallax: -- ± -- mas
+Gaia G-band-mag: 16.876486
+
+----Pulsar Attributes----
+ATNF DM: 24.337
+pc / cm^{3}
+ATNF PMRA: 4.6 ± 2.0e-01 mas/yr
+ATNF PMDEC: -3.8 ± 24.337
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J0337+1715
+
+----Gaia Match Attributes----
+Gaia Source ID: 44308738051547264
+Gaia PMRA: 5.480495136987953 mas/yr
+Gaia PMDEC: -4.427292334782167 mas/yr
+Gaia Parallax: 0.5416920661382117 ± 0.19513616 mas
+Gaia G-band-mag: 18.0523
+
+----Pulsar Attributes----
+ATNF DM: 21.3162
+pc / cm^{3}
+ATNF PMRA: 4.81 ± 4.9e-01 mas/yr
+ATNF PMDEC: -4.42 ± 21.3162
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J0348+0432
+
+----Gaia Match Attributes----
+Gaia Source ID: 3273288485744249344
+Gaia PMRA: 3.4381852148165697 mas/yr
+Gaia PMDEC: -0.22602818895594637 mas/yr
+Gaia Parallax: -0.03510799409612238 ± 0.78409487 mas
+Gaia G-band-mag: 20.58892
+
+----Pulsar Attributes----
+ATNF DM: 40.46313
+pc / cm^{3}
+ATNF PMRA: +4.04 ± 1.6e-01 mas/yr
+ATNF PMDEC: +3.5 ± 40.46313
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1012+5307
+
+----Gaia Match Attributes----
+Gaia Source ID: 851610861391010944
+Gaia PMRA: 2.7364450992406075 mas/yr
+Gaia PMDEC: -25.921120753058773 mas/yr
+Gaia Parallax: 1.7447569177332496 ± 0.29057664 mas
+Gaia G-band-mag: 19.586607
+
+----Pulsar Attributes----
+ATNF DM: 9.022146
+pc / cm^{3}
+ATNF PMRA: 2.64 ± 3.2e-02 mas/yr
+ATNF PMDEC: -25.54 ± 9.022146
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1023+0038
+
+----Gaia Match Attributes----
+Gaia Source ID: 3831382647922429952
+Gaia PMRA: 4.609895324338583 mas/yr
+Gaia PMDEC: -17.281024260717615 mas/yr
+Gaia Parallax: 0.6861708101572905 ± 0.07056036 mas
+Gaia G-band-mag: 16.232056
+
+----Pulsar Attributes----
+ATNF DM: 14.325
+pc / cm^{3}
+ATNF PMRA: 4.76 ± 3.0e-02 mas/yr
+ATNF PMDEC: -17.34 ± 14.325
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1125-6014
+
+----Gaia Match Attributes----
+Gaia Source ID: 5336020987242787328
+Gaia PMRA: -6.272741505193303 mas/yr
+Gaia PMDEC: 1.0720498229361572 mas/yr
+Gaia Parallax: 0.23567878337619225 ± 0.39101517 mas
+Gaia G-band-mag: 19.809261
+
+----Pulsar Attributes----
+ATNF DM: 52.9303
+pc / cm^{3}
+ATNF PMRA: 11.106 ± 1.4e-02 mas/yr
+ATNF PMDEC: -13.038 ± 52.9303
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1302-6350
+
+----Gaia Match Attributes----
+Gaia Source ID: 5862299960127967488
+Gaia PMRA: -7.092820662863646 mas/yr
+Gaia PMDEC: -0.34195092640087815 mas/yr
+Gaia Parallax: 0.44344477764993895 ± 0.013309076 mas
+Gaia G-band-mag: 9.632835
+
+----Pulsar Attributes----
+ATNF DM: 146.73
+pc / cm^{3}
+ATNF PMRA: -7.01 ± 3.0e-02 mas/yr
+ATNF PMDEC: -0.53 ± 146.73
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1417-4402
+
+----Gaia Match Attributes----
+Gaia Source ID: 6096705840454620800
+Gaia PMRA: -4.763750208392074 mas/yr
+Gaia PMDEC: -5.103216631918363 mas/yr
+Gaia Parallax: 0.19737278858599186 ± 0.047102146 mas
+Gaia G-band-mag: 15.771324
+
+----Pulsar Attributes----
+ATNF DM: 55.00
+pc / cm^{3}
+ATNF PMRA: -4.70 ± 1.0e-01 mas/yr
+ATNF PMDEC: -5.10 ± 55.00
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1723-2837
+
+----Gaia Match Attributes----
+Gaia Source ID: 4059795678905878528
+Gaia PMRA: -- mas/yr
+Gaia PMDEC: -- mas/yr
+Gaia Parallax: -- ± -- mas
+Gaia G-band-mag: 20.644478
+
+----Pulsar Attributes----
+ATNF DM: 19.688
+pc / cm^{3}
+ATNF PMRA: -11.713 ± 8.2e-02 mas/yr
+ATNF PMDEC: -23.990 ± 19.688
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1751-2857
+
+----Gaia Match Attributes----
+Gaia Source ID: 4057347444388501120
+Gaia PMRA: -- mas/yr
+Gaia PMDEC: -- mas/yr
+Gaia Parallax: -- ± -- mas
+Gaia G-band-mag: 20.995537
+
+----Pulsar Attributes----
+ATNF DM: 42.84
+pc / cm^{3}
+ATNF PMRA: -7.4 ± 1.0e-01 mas/yr
+ATNF PMDEC: -4.3 ± 42.84
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1801-3210
+
+----Gaia Match Attributes----
+Gaia Source ID: 4043712194647392128
+Gaia PMRA: -- mas/yr
+Gaia PMDEC: -- mas/yr
+Gaia Parallax: -- ± -- mas
+Gaia G-band-mag: 20.169302
+
+----Pulsar Attributes----
+ATNF DM: 177.713
+pc / cm^{3}
+ATNF PMRA: -4.0 ± 6.0e-01 mas/yr
+ATNF PMDEC: -4 ± 177.713
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1816+4510
+
+----Gaia Match Attributes----
+Gaia Source ID: 2115337192179377792
+Gaia PMRA: -0.05861630575280602 mas/yr
+Gaia PMDEC: -4.399506732960086 mas/yr
+Gaia Parallax: 0.22249783718568827 ± 0.101308666 mas
+Gaia G-band-mag: 18.195118
+
+----Pulsar Attributes----
+ATNF DM: 38.8874
+pc / cm^{3}
+ATNF PMRA: 5.3 ± 8.0e-01 mas/yr
+ATNF PMDEC: -3 ± 38.8874
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1910+1256
+
+----Gaia Match Attributes----
+Gaia Source ID: 4314046781982561920
+Gaia PMRA: -2.2518595290800283 mas/yr
+Gaia PMDEC: -6.090315406261422 mas/yr
+Gaia Parallax: -0.09600973820458453 ± 0.8472586 mas
+Gaia G-band-mag: 20.344213
+
+----Pulsar Attributes----
+ATNF DM: 38.067848
+pc / cm^{3}
+ATNF PMRA: 0.26 ± 3.1e-02 mas/yr
+ATNF PMDEC: -7.14 ± 38.067848
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1946+3417
+
+----Gaia Match Attributes----
+Gaia Source ID: 2047074979178939648
+Gaia PMRA: -0.8121277480248992 mas/yr
+Gaia PMDEC: -5.315792599592822 mas/yr
+Gaia Parallax: 3.1428273931673494 ± 0.8389677 mas
+Gaia G-band-mag: 20.180588
+
+----Pulsar Attributes----
+ATNF DM: 110.178388
+pc / cm^{3}
+ATNF PMRA: -7.68 ± 1.2e-01 mas/yr
+ATNF PMDEC: 4.58 ± 110.178388
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1955+2908
+
+----Gaia Match Attributes----
+Gaia Source ID: 2028584968839606784
+Gaia PMRA: -3.1673756465389253 mas/yr
+Gaia PMDEC: -7.826567155396902 mas/yr
+Gaia Parallax: 0.4748712032006062 ± 0.16951662 mas
+Gaia G-band-mag: 18.672125
+
+----Pulsar Attributes----
+ATNF DM: 104.516916
+pc / cm^{3}
+ATNF PMRA: -0.98 ± 5.1e-02 mas/yr
+ATNF PMDEC: -4.05 ± 104.516916
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J2032+4127
+
+----Gaia Match Attributes----
+Gaia Source ID: 2067835682818358400
+Gaia PMRA: -2.8762382942769733 mas/yr
+Gaia PMDEC: -0.9478946506888151 mas/yr
+Gaia Parallax: 0.5677534793686149 ± 0.015594214 mas
+Gaia G-band-mag: 11.277184
+
+----Pulsar Attributes----
+ATNF DM: 114.67
+pc / cm^{3}
+ATNF PMRA: -2.991 ± 4.8e-02 mas/yr
+ATNF PMDEC: -0.742 ± 114.67
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J2039-5617
+
+----Gaia Match Attributes----
+Gaia Source ID: 6469722508861870080
+Gaia PMRA: 3.861062488612513 mas/yr
+Gaia PMDEC: -15.179687664578143 mas/yr
+Gaia Parallax: 0.4886902269612317 ± 0.165951 mas
+Gaia G-band-mag: 18.516928
+
+----Pulsar Attributes----
+ATNF DM: 24.57
+pc / cm^{3}
+ATNF PMRA: 4.2 ± 3.0e-01 mas/yr
+ATNF PMDEC: -14.9 ± 24.57
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J2339-0533
+
+----Gaia Match Attributes----
+Gaia Source ID: 2440660623886405504
+Gaia PMRA: 3.923657379993803 mas/yr
+Gaia PMDEC: -10.279614780241074 mas/yr
+Gaia Parallax: 0.5346435911756503 ± 0.18320292 mas
+Gaia G-band-mag: 18.797928
+
+----Pulsar Attributes----
+ATNF DM: 8.717
+pc / cm^{3}
+ATNF PMRA: 4.15 ± 4.8e-01 mas/yr
+ATNF PMDEC: -10.31 ± 8.717
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J0024-7204U
+
+----Gaia Match Attributes----
+Gaia Source ID: 4689639472995311744
+Gaia PMRA: -- mas/yr
+Gaia PMDEC: -- mas/yr
+Gaia Parallax: -- ± -- mas
+Gaia G-band-mag: 16.876486
+
+----Pulsar Attributes----
+ATNF DM: 24.337
+pc / cm^{3}
+ATNF PMRA: 4.6 ± 2.0e-01 mas/yr
+ATNF PMDEC: -3.8 ± 24.337
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J0337+1715
+
+----Gaia Match Attributes----
+Gaia Source ID: 44308738051547264
+Gaia PMRA: 5.480495136987953 mas/yr
+Gaia PMDEC: -4.427292334782167 mas/yr
+Gaia Parallax: 0.5416920661382117 ± 0.19513616 mas
+Gaia G-band-mag: 18.0523
+
+----Pulsar Attributes----
+ATNF DM: 21.3162
+pc / cm^{3}
+ATNF PMRA: 4.81 ± 4.9e-01 mas/yr
+ATNF PMDEC: -4.42 ± 21.3162
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J0348+0432
+
+----Gaia Match Attributes----
+Gaia Source ID: 3273288485744249344
+Gaia PMRA: 3.4381852148165697 mas/yr
+Gaia PMDEC: -0.22602818895594637 mas/yr
+Gaia Parallax: -0.03510799409612238 ± 0.78409487 mas
+Gaia G-band-mag: 20.58892
+
+----Pulsar Attributes----
+ATNF DM: 40.46313
+pc / cm^{3}
+ATNF PMRA: +4.04 ± 1.6e-01 mas/yr
+ATNF PMDEC: +3.5 ± 40.46313
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1012+5307
+
+----Gaia Match Attributes----
+Gaia Source ID: 851610861391010944
+Gaia PMRA: 2.7364450992406075 mas/yr
+Gaia PMDEC: -25.921120753058773 mas/yr
+Gaia Parallax: 1.7447569177332496 ± 0.29057664 mas
+Gaia G-band-mag: 19.586607
+
+----Pulsar Attributes----
+ATNF DM: 9.022146
+pc / cm^{3}
+ATNF PMRA: 2.64 ± 3.2e-02 mas/yr
+ATNF PMDEC: -25.54 ± 9.022146
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1023+0038
+
+----Gaia Match Attributes----
+Gaia Source ID: 3831382647922429952
+Gaia PMRA: 4.609895324338583 mas/yr
+Gaia PMDEC: -17.281024260717615 mas/yr
+Gaia Parallax: 0.6861708101572905 ± 0.07056036 mas
+Gaia G-band-mag: 16.232056
+
+----Pulsar Attributes----
+ATNF DM: 14.325
+pc / cm^{3}
+ATNF PMRA: 4.76 ± 3.0e-02 mas/yr
+ATNF PMDEC: -17.34 ± 14.325
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1125-6014
+
+----Gaia Match Attributes----
+Gaia Source ID: 5336020987242787328
+Gaia PMRA: -6.272741505193303 mas/yr
+Gaia PMDEC: 1.0720498229361572 mas/yr
+Gaia Parallax: 0.23567878337619225 ± 0.39101517 mas
+Gaia G-band-mag: 19.809261
+
+----Pulsar Attributes----
+ATNF DM: 52.9303
+pc / cm^{3}
+ATNF PMRA: 11.106 ± 1.4e-02 mas/yr
+ATNF PMDEC: -13.038 ± 52.9303
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1302-6350
+
+----Gaia Match Attributes----
+Gaia Source ID: 5862299960127967488
+Gaia PMRA: -7.092820662863646 mas/yr
+Gaia PMDEC: -0.34195092640087815 mas/yr
+Gaia Parallax: 0.44344477764993895 ± 0.013309076 mas
+Gaia G-band-mag: 9.632835
+
+----Pulsar Attributes----
+ATNF DM: 146.73
+pc / cm^{3}
+ATNF PMRA: -7.01 ± 3.0e-02 mas/yr
+ATNF PMDEC: -0.53 ± 146.73
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1417-4402
+
+----Gaia Match Attributes----
+Gaia Source ID: 6096705840454620800
+Gaia PMRA: -4.763750208392074 mas/yr
+Gaia PMDEC: -5.103216631918363 mas/yr
+Gaia Parallax: 0.19737278858599186 ± 0.047102146 mas
+Gaia G-band-mag: 15.771324
+
+----Pulsar Attributes----
+ATNF DM: 55.00
+pc / cm^{3}
+ATNF PMRA: -4.70 ± 1.0e-01 mas/yr
+ATNF PMDEC: -5.10 ± 55.00
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1723-2837
+
+----Gaia Match Attributes----
+Gaia Source ID: 4059795678905878528
+Gaia PMRA: -- mas/yr
+Gaia PMDEC: -- mas/yr
+Gaia Parallax: -- ± -- mas
+Gaia G-band-mag: 20.644478
+
+----Pulsar Attributes----
+ATNF DM: 19.688
+pc / cm^{3}
+ATNF PMRA: -11.713 ± 8.2e-02 mas/yr
+ATNF PMDEC: -23.990 ± 19.688
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1751-2857
+
+----Gaia Match Attributes----
+Gaia Source ID: 4057347444388501120
+Gaia PMRA: -- mas/yr
+Gaia PMDEC: -- mas/yr
+Gaia Parallax: -- ± -- mas
+Gaia G-band-mag: 20.995537
+
+----Pulsar Attributes----
+ATNF DM: 42.84
+pc / cm^{3}
+ATNF PMRA: -7.4 ± 1.0e-01 mas/yr
+ATNF PMDEC: -4.3 ± 42.84
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1801-3210
+
+----Gaia Match Attributes----
+Gaia Source ID: 4043712194647392128
+Gaia PMRA: -- mas/yr
+Gaia PMDEC: -- mas/yr
+Gaia Parallax: -- ± -- mas
+Gaia G-band-mag: 20.169302
+
+----Pulsar Attributes----
+ATNF DM: 177.713
+pc / cm^{3}
+ATNF PMRA: -4.0 ± 6.0e-01 mas/yr
+ATNF PMDEC: -4 ± 177.713
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1816+4510
+
+----Gaia Match Attributes----
+Gaia Source ID: 2115337192179377792
+Gaia PMRA: -0.05861630575280602 mas/yr
+Gaia PMDEC: -4.399506732960086 mas/yr
+Gaia Parallax: 0.22249783718568827 ± 0.101308666 mas
+Gaia G-band-mag: 18.195118
+
+----Pulsar Attributes----
+ATNF DM: 38.8874
+pc / cm^{3}
+ATNF PMRA: 5.3 ± 8.0e-01 mas/yr
+ATNF PMDEC: -3 ± 38.8874
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1910+1256
+
+----Gaia Match Attributes----
+Gaia Source ID: 4314046781982561920
+Gaia PMRA: -2.2518595290800283 mas/yr
+Gaia PMDEC: -6.090315406261422 mas/yr
+Gaia Parallax: -0.09600973820458453 ± 0.8472586 mas
+Gaia G-band-mag: 20.344213
+
+----Pulsar Attributes----
+ATNF DM: 38.067848
+pc / cm^{3}
+ATNF PMRA: 0.26 ± 3.1e-02 mas/yr
+ATNF PMDEC: -7.14 ± 38.067848
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1946+3417
+
+----Gaia Match Attributes----
+Gaia Source ID: 2047074979178939648
+Gaia PMRA: -0.8121277480248992 mas/yr
+Gaia PMDEC: -5.315792599592822 mas/yr
+Gaia Parallax: 3.1428273931673494 ± 0.8389677 mas
+Gaia G-band-mag: 20.180588
+
+----Pulsar Attributes----
+ATNF DM: 110.178388
+pc / cm^{3}
+ATNF PMRA: -7.68 ± 1.2e-01 mas/yr
+ATNF PMDEC: 4.58 ± 110.178388
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J1955+2908
+
+----Gaia Match Attributes----
+Gaia Source ID: 2028584968839606784
+Gaia PMRA: -3.1673756465389253 mas/yr
+Gaia PMDEC: -7.826567155396902 mas/yr
+Gaia Parallax: 0.4748712032006062 ± 0.16951662 mas
+Gaia G-band-mag: 18.672125
+
+----Pulsar Attributes----
+ATNF DM: 104.516916
+pc / cm^{3}
+ATNF PMRA: -0.98 ± 5.1e-02 mas/yr
+ATNF PMDEC: -4.05 ± 104.516916
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J2032+4127
+
+----Gaia Match Attributes----
+Gaia Source ID: 2067835682818358400
+Gaia PMRA: -2.8762382942769733 mas/yr
+Gaia PMDEC: -0.9478946506888151 mas/yr
+Gaia Parallax: 0.5677534793686149 ± 0.015594214 mas
+Gaia G-band-mag: 11.277184
+
+----Pulsar Attributes----
+ATNF DM: 114.67
+pc / cm^{3}
+ATNF PMRA: -2.991 ± 4.8e-02 mas/yr
+ATNF PMDEC: -0.742 ± 114.67
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J2039-5617
+
+----Gaia Match Attributes----
+Gaia Source ID: 6469722508861870080
+Gaia PMRA: 3.861062488612513 mas/yr
+Gaia PMDEC: -15.179687664578143 mas/yr
+Gaia Parallax: 0.4886902269612317 ± 0.165951 mas
+Gaia G-band-mag: 18.516928
+
+----Pulsar Attributes----
+ATNF DM: 24.57
+pc / cm^{3}
+ATNF PMRA: 4.2 ± 3.0e-01 mas/yr
+ATNF PMDEC: -14.9 ± 24.57
+ mas/yr
+
+-------------------------------------------------------------
+PSR JNAME: J2339-0533
+
+----Gaia Match Attributes----
+Gaia Source ID: 2440660623886405504
+Gaia PMRA: 3.923657379993803 mas/yr
+Gaia PMDEC: -10.279614780241074 mas/yr
+Gaia Parallax: 0.5346435911756503 ± 0.18320292 mas
+Gaia G-band-mag: 18.797928
+
+----Pulsar Attributes----
+ATNF DM: 8.717
+pc / cm^{3}
+ATNF PMRA: 4.15 ± 4.8e-01 mas/yr
+ATNF PMDEC: -10.31 ± 8.717
+ mas/yr
+
+-------------------------------------------------------------
