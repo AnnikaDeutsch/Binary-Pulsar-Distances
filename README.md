@@ -3,11 +3,6 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About PSRmatch
-
-This project began when I participated in a one week long workshop called codeastro. In this workshop, we
-had the objective of building a small software package. The package I began in that week is the project I 
-continued to work on for the rest of the summer.  
-
 This package, PSRmatch, cross matches pulsars with Gaia to identify pulsar binary companions that are typically
 detectable in the Gaia (optical) wavelengths. It does this by taking in a list of pulsars, running them through
 a number of criteria to look at only those potentially useful in pulsar timing, searching in a small radius
