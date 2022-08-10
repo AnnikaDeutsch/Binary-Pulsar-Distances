@@ -4,7 +4,7 @@ setup(
     
     name="Binary_Pulsar_Distances",
 
-    version="0.1"
+    version="1.0.0"
 
     # packages=find_packages()
 )
