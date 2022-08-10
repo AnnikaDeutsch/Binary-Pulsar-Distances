@@ -1,3 +1,8 @@
 astropy
 astroquery
+csv
+matplotlib
 numpy
+os
+pandas
+pytest
