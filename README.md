@@ -37,7 +37,7 @@ to known parameters of certain pulsar companions, such as G-band magnitude.
 
 ## Documentation
 
-Documentation can be accessed 
+Documentation can be accessed here: file://wsl.localhost/Ubuntu/home/annika_deutsch/Binary-Pulsar-Distances/docs/_build/html/index.html
 
 <!-- LICENSE -->
 ## License
