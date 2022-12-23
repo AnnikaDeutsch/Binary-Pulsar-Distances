@@ -12,7 +12,7 @@
     as a package, and the test suites are also formatted properly
 
 
-From Jim/Shami meeting 10/26:
+From Cordes/Chatterjee meeting 10/26:
 Things to adjust in the matching process:
 - don't remove pulsar not known to be in binaries
 - probably all of the removal should occur afterward the gaia matching 
