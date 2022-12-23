@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Deutsch"
+  given-names: "Annika"
+title: "Binary Pulsar Distances"
+version: 1.1.0
+doi: 10.5281/zenodo.6979155
+date-released: 2022-08
+url: "https://github.com/AnnikaDeutsch/Binary-Pulsar-Distances"
