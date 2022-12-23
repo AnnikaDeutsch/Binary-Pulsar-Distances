@@ -17,7 +17,7 @@ import csv
 import pandas as pd
 
 
-def psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, radius):
+def psr_to_gaia(jname, raj, raerr, decj, decerr,  pmra, pmraerr, pmdec, pmdecerr, posepoch, radius):
     """Searches Gaia for possible companion to any given pulsar
 
     Given input parameters read in from a text file following the guidelines of ATNF parameters, 
@@ -40,11 +40,15 @@ def psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, radius):
     """
 
     from astropy.time import Time 
-    p_ra = raj # comes in as a string of units hh:mm:ss.ss
-    p_dec = decj # comes in as a string of units dd:mm:ss.s
-    p_pmra = pmra # comes in as a string of units mas/yr
-    p_pmdec = pmdec # comes in as a string of units mas/yr
+    p_ra = raj # comes in as a string of units hh:mm:ss.ss, atnf ra
+    p_dec = decj # comes in as a string of units dd:mm:ss.s, atnf dec
+    p_pmra = pmra # comes in as a string of units mas/yr, atnf pmra
+    p_pmdec = pmdec # comes in as a string of units mas/yr, atnf pmdec
     p_epoch = Time(posepoch, format='mjd').jyear # comes in in units mjd, is immediately converted to jyear tcb
+    ra_err = raerr
+    dec_err = decerr
+    pmra_err = pmraerr
+    pmdec_err = pmdecerr
 
     p_ra_ang = Angle(p_ra + ' hours') # stores the ra in hms as an Angle object
     p_dec_ang = Angle(p_dec + ' degrees') # stores the dec in dms as an Angle object
@@ -83,13 +87,14 @@ def psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, radius):
     Gaia.ROW_LIMIT = 2000
     Gaia.MAIN_GAIA_TABLE = "gaiadr3.gaia_source" # Select early Data Release 3
     coord=SkyCoord(ra=p_new_ra, dec=p_new_dec, unit=(u.degree, u.degree), frame='icrs')
-    radius = u.Quantity(5, u.arcsec)
+    
+    
     width_gaia = u.Quantity(1., u.arcmin) # by default, queries in 1 arcmin range
     height_gaia = u.Quantity(1., u.arcmin) # by default, queries in 1 arcmin range
     if jname == 'J0437-4715':
         j = Gaia.cone_search_async(coordinate=coord, radius=u.Quantity(5., u.arcsec))
     else:
-        j = Gaia.cone_search_async(coordinate=coord, radius=radius)
+        j = Gaia.cone_search_async(coordinate=coord, radius=u.Quantity(radius, u.arcsec))
     results = j.get_results()
 
     # use python sort function
@@ -110,7 +115,7 @@ def get_matches(input_file, output_file, radius=1.):
 
     Args: 
         input_file (str): Name of the text file (csv) containing each pulsar with the parameters 'index', 'jname', 
-            'ra', 'dec', 'pmra', 'pmdec', 'posepoch' row by row for each object.
+            'ra', 'raerr', 'dec', 'decerr', 'pmra', 'pmraerr', 'pmdec', 'pmdecerr', 'posepoch', 'dm' row by row for each object.
         output_file (str): Name of the text file which the pulsar-gaia matches will be output to. If desired,
             specify the full path to which the file should be saved, otherwise it will just be saved to the 
             present working directory
@@ -133,13 +138,13 @@ def get_matches(input_file, output_file, radius=1.):
       # Parse input
       values = line.split(';')
 
-      if values[2] == '*' or values[3] == '*' or values[4] == '*' or values[5] == '*' or values[6] == '*':
+      if values[2] == '*' or values[4] == '*' or values[6] == '*' or values[8] == '*':
         skipped += 1
         continue
 
       # Add result to supertable
-      # psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, radius)
-      search_result = psr_to_gaia(values[1],values[2],values[3],values[4],values[5],values[6],radius)
+      #psr_to_gaia(jname, raj, raerr, decj, decerr,  pmra, pmraerr, pmdec, pmdecerr, posepoch, radius)
+      search_result = psr_to_gaia(values[1],values[2],values[3],values[4],values[5],values[6],values[7],values[8],values[9],values[10],radius)
       if (len(search_result) == 0):
         continue
       if first_time:
@@ -178,11 +183,11 @@ def check_binary(input_file, output_file):
     count = 1
     for line in f:
         values = line.split(';')
-        while len(values) - 1 > 11:
+        while len(values) - 1 > 13:
             values.pop()
-        if values[11] != "*":
+        if values[13] != "*": # parameter of whether binary or not 
             values[0] = count
-            values[11] = values[11].replace('\n',';')
+            values[13] = values[13].replace('\n',';')
             if first_time:
                 new.insert(0, values)
                 first_time = False
@@ -247,9 +252,9 @@ def check_pos_uncertainty(input_file, output_file):
                     values.pop(14)
                     values.pop(11)
                     values.pop(8)
-                    values.pop(7)
+                    # values.pop(7) # don't want to remove error in dec
                     values.pop(5)
-                    values.pop(4)
+                    # values.pop(4) # don't want to remove error in ra
                     values.pop(2)
                     values[0] = count 
                     # values[9] = values[9].replace('\n',';')
@@ -295,7 +300,7 @@ def check_in_globular(input_file, output_file):
     for line in f:
         not_match = True
         values = line.split(';')
-        while len(values) - 1 > 9:
+        while len(values) - 1 > 11:
             values.pop()
         g = open('/home/annika_deutsch/Binary-Pulsar-Distances/Binary_Pulsar_Distances/gc_pulsar_names.csv', 'r')
         for line in g:
@@ -374,7 +379,7 @@ def pretty_print(pulsar, source_id, filename, no_glob):
 
 
 def matching_pipeline(input_file, output_file, no_pos, no_bin, no_glob, match_all_params, radius=1., 
-                      pretty_print= False):
+                      pretty_print= False, remove_bin= False):
     """Carries out the identification of sources from a list of pulsars to a list potential Gaia matches.
 
     Takes as input a text file of the ATNF format "long with errors", and runs through each step of the source
@@ -402,9 +407,13 @@ def matching_pipeline(input_file, output_file, no_pos, no_bin, no_glob, match_al
     
     """
     check_pos_uncertainty(input_file, no_pos)
-    check_binary(no_pos, no_bin)
-    check_in_globular(no_bin, no_glob)
-    get_matches(no_glob, match_all_params, radius= radius)
+    if remove_bin: 
+        check_binary(no_pos, no_bin)
+        check_in_globular(no_bin, no_glob)
+        get_matches(no_glob, match_all_params, radius= radius)
+    else: 
+        check_in_globular(no_pos, no_glob)
+        get_matches(no_glob, match_all_params, radius= radius)
 
     # script to create an updated version of all_final.csv with only the parameters we wanna look at
 
@@ -453,51 +462,17 @@ def matching_pipeline(input_file, output_file, no_pos, no_bin, no_glob, match_al
                 pretty_print(values[0], values[1], filename, no_glob)
 
 
-#os.chdir('\home\annika_deutsch\Binary-Pulsar-Distances\Binary_Pulsar_Distances')
+# os.chdir('\home\annika_deutsch\Binary-Pulsar-Distances\Binary_Pulsar_Distances')
 print(os.getcwd())
 print(os.listdir())
 
-# matching_pipeline('10_3_3as_input.csv', 
-#                   '10_3_3as_output.csv', 
-#                   '10_3_3as_nopos.csv', 
-#                   '10_3_3as_nobin.csv', 
-#                   '10_3_3as_noglob.csv',
-#                   '10_3_3as_allparams.csv')
+matching_pipeline('10_3_3as_input.csv', 
+                  '10_3_3as_output.csv', 
+                  '10_3_3as_nopos.csv', 
+                  '10_3_3as_nobin.csv', 
+                  '10_3_3as_noglob.csv',
+                  '10_3_3as_allparams.csv', 
+                  radius= 3.)
 
-# get_matches('psr_superset.csv','psr_superset_output.csv', radius=5.)
-
-c = open('psr_superset_output.csv', 'r')
-new = []
-first_time = True
-for line in c:
-    values = line.split(',')
-    values.pop(95)
-    count = 0 
-    while count < 40:
-        values.pop(91-count)
-        count += 1
-    index = 0
-    while index < 30:
-        values.pop(50-index)
-        index += 1
-    values.pop(12)
-    values.pop(9)
-    values.pop(8)
-    values.pop(7)
-    values.pop(6)
-    values.pop(5)
-    values.pop(4)
-    values.pop(2)
-    values.pop(1)
-    values.pop()
-    if first_time:
-        new.insert(0,values)
-        first_time = False
-    else:
-        new.append(values)
-import csv
-with open('psr_superset_final.csv', 'w') as h:
-    write = csv.writer(h, delimiter=';')
-    write.writerows(new)
 
 
