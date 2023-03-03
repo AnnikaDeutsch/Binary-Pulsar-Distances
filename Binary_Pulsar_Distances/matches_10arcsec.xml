@@ -1,0 +1,976 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Produced with astropy.io.votable version 5.1
+     http://www.astropy.org/ -->
+<VOTABLE version="1.4" xmlns="http://www.ivoa.net/xml/VOTable/v1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.ivoa.net/xml/VOTable/v1.3 http://www.ivoa.net/xml/VOTable/VOTable-1.4.xsd">
+ <RESOURCE type="results">
+  <TABLE>
+   <FIELD ID="solution_id" datatype="long" name="solution_id" ucd="meta.version">
+    <DESCRIPTION>
+     Solution Identifier
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="DESIGNATION" arraysize="*" datatype="char" name="DESIGNATION" ucd="meta.id;meta.main">
+    <DESCRIPTION>
+     Unique source designation (unique across all Data Releases)
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="source_id" datatype="long" name="source_id" ucd="meta.id">
+    <DESCRIPTION>
+     Unique source identifier (unique within a particular Data
+     Release)
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="random_index" datatype="long" name="random_index" ucd="meta.code">
+    <DESCRIPTION>
+     Random index for use when selecting subsets
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ref_epoch" datatype="double" name="ref_epoch" ucd="meta.ref;time.epoch" unit="yr" utype="stc:AstroCoords.Time.TimeInstant">
+    <DESCRIPTION>
+     Reference epoch
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ra" datatype="double" name="ra" ucd="pos.eq.ra;meta.main" unit="deg" utype="stc:AstroCoords.Position3D.Value3.C1">
+    <DESCRIPTION>
+     Right ascension
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ra_error" datatype="float" name="ra_error" ucd="stat.error;pos.eq.ra" unit="mas" utype="stc:AstroCoords.Position3D.Error3.C1">
+    <DESCRIPTION>
+     Standard error of right ascension
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="dec" datatype="double" name="dec" ucd="pos.eq.dec;meta.main" unit="deg" utype="stc:AstroCoords.Position3D.Value3.C2">
+    <DESCRIPTION>
+     Declination
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="dec_error" datatype="float" name="dec_error" ucd="stat.error;pos.eq.dec" unit="mas" utype="stc:AstroCoords.Position3D.Error3.C2">
+    <DESCRIPTION>
+     Standard error of declination
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="parallax" datatype="double" name="parallax" ucd="pos.parallax.trig" unit="mas">
+    <DESCRIPTION>
+     Parallax
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="parallax_error" datatype="float" name="parallax_error" ucd="stat.error;pos.parallax.trig" unit="mas">
+    <DESCRIPTION>
+     Standard error of parallax
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="parallax_over_error" datatype="float" name="parallax_over_error" ucd="stat.snr;pos.parallax.trig">
+    <DESCRIPTION>
+     Parallax divided by its standard error
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="pm" datatype="float" name="pm" ucd="pos.pm;pos.eq" unit="mas.yr-1">
+    <DESCRIPTION>
+     Total proper motion
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="pmra" datatype="double" name="pmra" ucd="pos.pm;pos.eq.ra" unit="mas.yr-1" utype="stc:AstroCoords.Velocity3D.Value3.C1">
+    <DESCRIPTION>
+     Proper motion in right ascension direction
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="pmra_error" datatype="float" name="pmra_error" ucd="stat.error;pos.pm;pos.eq.ra" unit="mas.yr-1" utype="stc:AstroCoords.Velocity3D.Error3.C1">
+    <DESCRIPTION>
+     Standard error of proper motion in right ascension direction
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="pmdec" datatype="double" name="pmdec" ucd="pos.pm;pos.eq.dec" unit="mas.yr-1" utype="stc:AstroCoords.Velocity3D.Value3.C2">
+    <DESCRIPTION>
+     Proper motion in declination direction
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="pmdec_error" datatype="float" name="pmdec_error" ucd="stat.error;pos.pm;pos.eq.dec" unit="mas.yr-1" utype="stc:AstroCoords.Velocity3D.Error3.C2">
+    <DESCRIPTION>
+     Standard error of proper motion in declination direction
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ra_dec_corr" datatype="float" name="ra_dec_corr" ucd="stat.correlation">
+    <DESCRIPTION>
+     Correlation between right ascension and declination
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ra_parallax_corr" datatype="float" name="ra_parallax_corr" ucd="stat.correlation">
+    <DESCRIPTION>
+     Correlation between right ascension and parallax
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ra_pmra_corr" datatype="float" name="ra_pmra_corr" ucd="stat.correlation">
+    <DESCRIPTION>
+     Correlation between right ascension and proper motion in right
+     ascension
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ra_pmdec_corr" datatype="float" name="ra_pmdec_corr" ucd="stat.correlation">
+    <DESCRIPTION>
+     Correlation between right ascension and proper motion in
+     declination
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="dec_parallax_corr" datatype="float" name="dec_parallax_corr" ucd="stat.correlation">
+    <DESCRIPTION>
+     Correlation between declination and parallax
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="dec_pmra_corr" datatype="float" name="dec_pmra_corr" ucd="stat.correlation">
+    <DESCRIPTION>
+     Correlation between declination and proper motion in right
+     ascension
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="dec_pmdec_corr" datatype="float" name="dec_pmdec_corr" ucd="stat.correlation">
+    <DESCRIPTION>
+     Correlation between declination and proper motion in declination
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="parallax_pmra_corr" datatype="float" name="parallax_pmra_corr" ucd="stat.correlation">
+    <DESCRIPTION>
+     Correlation between parallax and proper motion in right ascension
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="parallax_pmdec_corr" datatype="float" name="parallax_pmdec_corr" ucd="stat.correlation">
+    <DESCRIPTION>
+     Correlation between parallax and proper motion in declination
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="pmra_pmdec_corr" datatype="float" name="pmra_pmdec_corr" ucd="stat.correlation">
+    <DESCRIPTION>
+     Correlation between proper motion in right ascension and proper
+     motion in declination
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="astrometric_n_obs_al" datatype="short" name="astrometric_n_obs_al" ucd="meta.number">
+    <DESCRIPTION>
+     Total number of observations in the along-scan (AL) direction
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="astrometric_n_obs_ac" datatype="short" name="astrometric_n_obs_ac" ucd="meta.number">
+    <DESCRIPTION>
+     Total number of observations in the across-scan (AC) direction
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="astrometric_n_good_obs_al" datatype="short" name="astrometric_n_good_obs_al" ucd="meta.number">
+    <DESCRIPTION>
+     Number of good observations in the along-scan (AL) direction
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="astrometric_n_bad_obs_al" datatype="short" name="astrometric_n_bad_obs_al" ucd="meta.number">
+    <DESCRIPTION>
+     Number of bad observations in the along-scan (AL) direction
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="astrometric_gof_al" datatype="float" name="astrometric_gof_al" ucd="stat.fit.goodness">
+    <DESCRIPTION>
+     Goodness of fit statistic of model wrt along-scan observations
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="astrometric_chi2_al" datatype="float" name="astrometric_chi2_al" ucd="stat.fit.chi2">
+    <DESCRIPTION>
+     AL chi-square value
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="astrometric_excess_noise" datatype="float" name="astrometric_excess_noise" ucd="stat.value" unit="mas">
+    <DESCRIPTION>
+     Excess noise of the source
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="astrometric_excess_noise_sig" datatype="float" name="astrometric_excess_noise_sig" ucd="stat.value">
+    <DESCRIPTION>
+     Significance of excess noise
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="astrometric_params_solved" datatype="short" name="astrometric_params_solved" ucd="meta.number">
+    <DESCRIPTION>
+     Which parameters have been solved for?
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="astrometric_primary_flag" datatype="bit" name="astrometric_primary_flag" ucd="meta.code">
+    <DESCRIPTION>
+     Primary or seconday
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="nu_eff_used_in_astrometry" datatype="float" name="nu_eff_used_in_astrometry" ucd="em.wavenumber" unit="um-1">
+    <DESCRIPTION>
+     Effective wavenumber of the source used in the astrometric
+     solution
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="pseudocolour" datatype="float" name="pseudocolour" ucd="em.wavenumber" unit="um-1">
+    <DESCRIPTION>
+     Astrometrically estimated pseudocolour of the source
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="pseudocolour_error" datatype="float" name="pseudocolour_error" ucd="stat.error;em.wavenumber" unit="um-1">
+    <DESCRIPTION>
+     Standard error of the pseudocolour of the source
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ra_pseudocolour_corr" datatype="float" name="ra_pseudocolour_corr" ucd="stat.correlation;em.wavenumber;pos.eq.ra">
+    <DESCRIPTION>
+     Correlation between right ascension and pseudocolour
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="dec_pseudocolour_corr" datatype="float" name="dec_pseudocolour_corr" ucd="stat.correlation;em.wavenumber;pos.eq.dec">
+    <DESCRIPTION>
+     Correlation between declination and pseudocolour
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="parallax_pseudocolour_corr" datatype="float" name="parallax_pseudocolour_corr" ucd="stat.correlation;em.wavenumber;pos.parallax">
+    <DESCRIPTION>
+     Correlation between parallax and pseudocolour
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="pmra_pseudocolour_corr" datatype="float" name="pmra_pseudocolour_corr" ucd="stat.correlation;em.wavenumber;pos.pm;pos.eq.ra">
+    <DESCRIPTION>
+     Correlation between proper motion in right asension and
+     pseudocolour
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="pmdec_pseudocolour_corr" datatype="float" name="pmdec_pseudocolour_corr" ucd="stat.correlation;em.wavenumber;pos.pm;pos.eq.dec">
+    <DESCRIPTION>
+     Correlation between proper motion in declination and pseudocolour
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="astrometric_matched_transits" datatype="short" name="astrometric_matched_transits" ucd="meta.number">
+    <DESCRIPTION>
+     Matched FOV transits used in the AGIS solution
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="visibility_periods_used" datatype="short" name="visibility_periods_used" ucd="meta.number">
+    <DESCRIPTION>
+     Number of visibility periods used in Astrometric solution
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="astrometric_sigma5d_max" datatype="float" name="astrometric_sigma5d_max" ucd="stat;pos.errorEllipse" unit="mas">
+    <DESCRIPTION>
+     The longest semi-major axis of the 5-d error ellipsoid
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="matched_transits" datatype="short" name="matched_transits" ucd="meta.number">
+    <DESCRIPTION>
+     The number of transits matched to this source
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="new_matched_transits" datatype="short" name="new_matched_transits" ucd="meta.number">
+    <DESCRIPTION>
+     The number of transits newly incorporated into an existing source
+     in the current cycle
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="matched_transits_removed" datatype="short" name="matched_transits_removed" ucd="meta.number">
+    <DESCRIPTION>
+     The number of transits removed from an existing source in the
+     current cycle
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ipd_gof_harmonic_amplitude" datatype="float" name="ipd_gof_harmonic_amplitude" ucd="stat.value">
+    <DESCRIPTION>
+     Amplitude of the IPD GoF versus position angle of scan
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ipd_gof_harmonic_phase" datatype="float" name="ipd_gof_harmonic_phase" ucd="pos.posAng;stat.value" unit="deg">
+    <DESCRIPTION>
+     Phase of the IPD GoF versus position angle of scan
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ipd_frac_multi_peak" datatype="short" name="ipd_frac_multi_peak" ucd="stat.value">
+    <DESCRIPTION>
+     Percent of successful-IPD windows with more than one peak
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ipd_frac_odd_win" datatype="short" name="ipd_frac_odd_win" ucd="stat.value">
+    <DESCRIPTION>
+     Percent of transits with truncated windows or multiple gate
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ruwe" datatype="float" name="ruwe" ucd="stat.error">
+    <DESCRIPTION>
+     Renormalised unit weight error
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="scan_direction_strength_k1" datatype="float" name="scan_direction_strength_k1" ucd="stat.value">
+    <DESCRIPTION>
+     Degree of concentration of scan directions across the source
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="scan_direction_strength_k2" datatype="float" name="scan_direction_strength_k2" ucd="stat.value">
+    <DESCRIPTION>
+     Degree of concentration of scan directions across the source
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="scan_direction_strength_k3" datatype="float" name="scan_direction_strength_k3" ucd="stat.value">
+    <DESCRIPTION>
+     Degree of concentration of scan directions across the source
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="scan_direction_strength_k4" datatype="float" name="scan_direction_strength_k4" ucd="stat.value">
+    <DESCRIPTION>
+     Degree of concentration of scan directions across the source
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="scan_direction_mean_k1" datatype="float" name="scan_direction_mean_k1" ucd="pos.posAng;stat.mean" unit="deg">
+    <DESCRIPTION>
+     Mean position angle of scan directions across the source
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="scan_direction_mean_k2" datatype="float" name="scan_direction_mean_k2" ucd="pos.posAng;stat.mean" unit="deg">
+    <DESCRIPTION>
+     Mean position angle of scan directions across the source
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="scan_direction_mean_k3" datatype="float" name="scan_direction_mean_k3" ucd="pos.posAng;stat.mean" unit="deg">
+    <DESCRIPTION>
+     Mean position angle of scan directions across the source
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="scan_direction_mean_k4" datatype="float" name="scan_direction_mean_k4" ucd="pos.posAng;stat.mean" unit="deg">
+    <DESCRIPTION>
+     Mean position angle of scan directions across the source
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="duplicated_source" datatype="bit" name="duplicated_source" ucd="meta.code.status">
+    <DESCRIPTION>
+     Source with multiple source identifiers
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_g_n_obs" datatype="short" name="phot_g_n_obs" ucd="meta.number">
+    <DESCRIPTION>
+     Number of observations contributing to G photometry
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_g_mean_flux" datatype="double" name="phot_g_mean_flux" ucd="phot.flux;em.opt" unit="electron.s-1">
+    <DESCRIPTION>
+     G-band mean flux
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_g_mean_flux_error" datatype="float" name="phot_g_mean_flux_error" ucd="stat.error;phot.flux;em.opt" unit="electron.s-1">
+    <DESCRIPTION>
+     Error on G-band mean flux
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_g_mean_flux_over_error" datatype="float" name="phot_g_mean_flux_over_error" ucd="stat.snr;phot.flux;em.opt">
+    <DESCRIPTION>
+     G-band mean flux divided by its error
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_g_mean_mag" datatype="float" name="phot_g_mean_mag" ucd="phot.mag;em.opt" unit="mag">
+    <DESCRIPTION>
+     G-band mean magnitude
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_bp_n_obs" datatype="short" name="phot_bp_n_obs" ucd="meta.number">
+    <DESCRIPTION>
+     Number of observations contributing to BP photometry
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_bp_mean_flux" datatype="double" name="phot_bp_mean_flux" ucd="phot.flux;em.opt.B" unit="electron.s-1">
+    <DESCRIPTION>
+     Integrated BP mean flux
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_bp_mean_flux_error" datatype="float" name="phot_bp_mean_flux_error" ucd="stat.error;phot.flux;em.opt.B" unit="electron.s-1">
+    <DESCRIPTION>
+     Error on the integrated BP mean flux
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_bp_mean_flux_over_error" datatype="float" name="phot_bp_mean_flux_over_error" ucd="stat.snr;phot.flux;em.opt.B">
+    <DESCRIPTION>
+     Integrated BP mean flux divided by its error
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_bp_mean_mag" datatype="float" name="phot_bp_mean_mag" ucd="phot.mag;em.opt.B" unit="mag">
+    <DESCRIPTION>
+     Integrated BP mean magnitude
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_rp_n_obs" datatype="short" name="phot_rp_n_obs" ucd="meta.number">
+    <DESCRIPTION>
+     Number of observations contributing to RP photometry
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_rp_mean_flux" datatype="double" name="phot_rp_mean_flux" ucd="phot.flux;em.opt.R" unit="electron.s-1">
+    <DESCRIPTION>
+     Integrated RP mean flux
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_rp_mean_flux_error" datatype="float" name="phot_rp_mean_flux_error" ucd="stat.error;phot.flux;em.opt.R" unit="electron.s-1">
+    <DESCRIPTION>
+     Error on the integrated RP mean flux
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_rp_mean_flux_over_error" datatype="float" name="phot_rp_mean_flux_over_error" ucd="stat.snr;phot.flux;em.opt.R">
+    <DESCRIPTION>
+     Integrated RP mean flux divided by its error
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_rp_mean_mag" datatype="float" name="phot_rp_mean_mag" ucd="phot.mag;em.opt.R" unit="mag">
+    <DESCRIPTION>
+     Integrated RP mean magnitude
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_bp_rp_excess_factor" datatype="float" name="phot_bp_rp_excess_factor" ucd="arith.factor;phot.flux;em.opt">
+    <DESCRIPTION>
+     BP/RP excess factor
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_bp_n_contaminated_transits" datatype="short" name="phot_bp_n_contaminated_transits" ucd="meta.number">
+    <DESCRIPTION>
+     Number of BP contaminated transits
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_bp_n_blended_transits" datatype="short" name="phot_bp_n_blended_transits" ucd="meta.number">
+    <DESCRIPTION>
+     Number of BP blended transits
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_rp_n_contaminated_transits" datatype="short" name="phot_rp_n_contaminated_transits" ucd="meta.number">
+    <DESCRIPTION>
+     Number of RP contaminated transits
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_rp_n_blended_transits" datatype="short" name="phot_rp_n_blended_transits" ucd="meta.number">
+    <DESCRIPTION>
+     Number of RP blended transits
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_proc_mode" datatype="short" name="phot_proc_mode" ucd="meta.code">
+    <DESCRIPTION>
+     Photometry processing mode
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="bp_rp" datatype="float" name="bp_rp" ucd="phot.color;em.opt.B;em.opt.R" unit="mag">
+    <DESCRIPTION>
+     BP - RP colour
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="bp_g" datatype="float" name="bp_g" ucd="phot.color;em.opt.B;em.opt" unit="mag">
+    <DESCRIPTION>
+     BP - G colour
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="g_rp" datatype="float" name="g_rp" ucd="phot.color;em.opt;em.opt.R" unit="mag">
+    <DESCRIPTION>
+     G - RP colour
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="radial_velocity" datatype="float" name="radial_velocity" ucd="spect.dopplerVeloc.opt;em.opt.I" unit="km.s-1" utype="stc:AstroCoords.Velocity3D.Value3.C3">
+    <DESCRIPTION>
+     Radial velocity
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="radial_velocity_error" datatype="float" name="radial_velocity_error" ucd="stat.error;spect.dopplerVeloc.opt;em.opt.I" unit="km.s-1" utype="stc:AstroCoords.Velocity3D.Error3.C3">
+    <DESCRIPTION>
+     Radial velocity error
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="rv_method_used" datatype="short" name="rv_method_used" ucd="meta.code.class">
+    <DESCRIPTION>
+     Method used to obtain the radial velocity
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="rv_nb_transits" datatype="short" name="rv_nb_transits" ucd="meta.number">
+    <DESCRIPTION>
+     Number of transits used to compute the radial velocity
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="rv_nb_deblended_transits" datatype="short" name="rv_nb_deblended_transits" ucd="meta.number">
+    <DESCRIPTION>
+     Number of valid transits that have undergone deblending
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="rv_visibility_periods_used" datatype="short" name="rv_visibility_periods_used" ucd="meta.number">
+    <DESCRIPTION>
+     Number of visibility periods used to estimate the radial velocity
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="rv_expected_sig_to_noise" datatype="float" name="rv_expected_sig_to_noise" ucd="stat.snr">
+    <DESCRIPTION>
+     Expected signal to noise ratio in the combination of the spectra
+     used to obtain the radial velocity
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="rv_renormalised_gof" datatype="float" name="rv_renormalised_gof" ucd="stat.fit.goodness">
+    <DESCRIPTION>
+     Radial velocity renormalised goodness of fit
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="rv_chisq_pvalue" datatype="float" name="rv_chisq_pvalue" ucd="stat.fit.param">
+    <DESCRIPTION>
+     P-value for constancy based on a chi-squared criterion
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="rv_time_duration" datatype="float" name="rv_time_duration" ucd="time.duration" unit="d">
+    <DESCRIPTION>
+     Time coverage of the radial velocity time series
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="rv_amplitude_robust" datatype="float" name="rv_amplitude_robust" ucd="stat.error;spect.dopplerVeloc.opt;em.opt.I" unit="km.s-1">
+    <DESCRIPTION>
+     Total amplitude in the radial velocity time series after outlier
+     removal
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="rv_template_teff" datatype="float" name="rv_template_teff" ucd="stat.fit.param" unit="K">
+    <DESCRIPTION>
+     Teff of the template used to compute the radial velocity
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="rv_template_logg" datatype="float" name="rv_template_logg" ucd="stat.fit.param" unit="log(cm.s**-2)">
+    <DESCRIPTION>
+     Logg of the template used to compute the radial velocity
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="rv_template_fe_h" datatype="float" name="rv_template_fe_h" ucd="stat.fit.param" unit="dex">
+    <DESCRIPTION>
+     [Fe/H] of the template used to compute the radial velocityy
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="rv_atm_param_origin" datatype="short" name="rv_atm_param_origin" ucd="meta.code.class">
+    <DESCRIPTION>
+     Origin of the atmospheric parameters associated to the template
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="vbroad" datatype="float" name="vbroad" ucd="spect.dopplerVeloc.opt;em.opt.I" unit="km.s-1" utype="stc:AstroCoords.Velocity3D.Value3.C3">
+    <DESCRIPTION>
+     Spectral line broadening parameter
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="vbroad_error" datatype="float" name="vbroad_error" ucd="stat.error;spect.dopplerVeloc.opt;em.opt.I" unit="km.s-1" utype="stc:AstroCoords.Velocity3D.Error3.C3">
+    <DESCRIPTION>
+     Uncertainty on the spectral line broadening
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="vbroad_nb_transits" datatype="short" name="vbroad_nb_transits" ucd="meta.number">
+    <DESCRIPTION>
+     Number of transits used to compute vbroad
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="grvs_mag" datatype="float" name="grvs_mag" ucd="phot.mag;em.opt" unit="mag" utype="stc:AstroCoords.Velocity3D.Value3.C3">
+    <DESCRIPTION>
+     Integrated Grvs magnitude
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="grvs_mag_error" datatype="float" name="grvs_mag_error" ucd="stat.error;phot.mag;em.opt" unit="mag" utype="stc:AstroCoords.Velocity3D.Error3.C3">
+    <DESCRIPTION>
+     Grvs magnitude uncertainty
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="grvs_mag_nb_transits" datatype="short" name="grvs_mag_nb_transits" ucd="meta.number">
+    <DESCRIPTION>
+     Number of transits used to compute Grvs
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="rvs_spec_sig_to_noise" datatype="float" name="rvs_spec_sig_to_noise" ucd="stat.snr">
+    <DESCRIPTION>
+     Signal to noise ratio in the mean RVS spectrum
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="phot_variable_flag" arraysize="*" datatype="char" name="phot_variable_flag" ucd="meta.code;src.var">
+    <DESCRIPTION>
+     Photometric variability flag
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="l" datatype="double" name="l" ucd="pos.galactic.lon" unit="deg" utype="stc:AstroCoords.Position2D.Value2.C1">
+    <DESCRIPTION>
+     Galactic longitude
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="b" datatype="double" name="b" ucd="pos.galactic.lat" unit="deg" utype="stc:AstroCoords.Position2D.Value2.C2">
+    <DESCRIPTION>
+     Galactic latitude
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ecl_lon" datatype="double" name="ecl_lon" ucd="pos.ecliptic.lon" unit="deg" utype="stc:AstroCoords.Position2D.Value2.C1">
+    <DESCRIPTION>
+     Ecliptic longitude
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ecl_lat" datatype="double" name="ecl_lat" ucd="pos.ecliptic.lat" unit="deg" utype="stc:AstroCoords.Position2D.Value2.C2">
+    <DESCRIPTION>
+     Ecliptic latitude
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="in_qso_candidates" datatype="bit" name="in_qso_candidates" ucd="meta.code.status">
+    <DESCRIPTION>
+     Flag indicating the availability of additional information in the
+     QSO candidates table
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="in_galaxy_candidates" datatype="bit" name="in_galaxy_candidates" ucd="meta.code.status">
+    <DESCRIPTION>
+     Flag indicating the availability of additional information in the
+     galaxy candidates table
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="non_single_star" datatype="short" name="non_single_star" ucd="meta.code.status">
+    <DESCRIPTION>
+     Flag indicating the availability of additional information in the
+     various Non-Single Star tables
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="has_xp_continuous" datatype="bit" name="has_xp_continuous" ucd="meta.code.status">
+    <DESCRIPTION>
+     Flag indicating the availability of mean BP/RP spectrum in
+     continuous representation for this source
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="has_xp_sampled" datatype="bit" name="has_xp_sampled" ucd="meta.code.status">
+    <DESCRIPTION>
+     Flag indicating the availability of mean BP/RP spectrum in
+     sampled form for this source
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="has_rvs" datatype="bit" name="has_rvs" ucd="meta.code.status">
+    <DESCRIPTION>
+     Flag indicating the availability of mean RVS spectrum for this
+     source
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="has_epoch_photometry" datatype="bit" name="has_epoch_photometry" ucd="meta.code.status">
+    <DESCRIPTION>
+     Flag indicating the availability of epoch photometry for this
+     source
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="has_epoch_rv" datatype="bit" name="has_epoch_rv" ucd="meta.code.status">
+    <DESCRIPTION>
+     Flag indicating the availability of epoch radial velocity for
+     this source
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="has_mcmc_gspphot" datatype="bit" name="has_mcmc_gspphot" ucd="meta.code.status">
+    <DESCRIPTION>
+     Flag indicating the availability of GSP-Phot MCMC samples for
+     this source
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="has_mcmc_msc" datatype="bit" name="has_mcmc_msc" ucd="meta.code.status">
+    <DESCRIPTION>
+     Flag indicating the availability of MSC MCMC samples for this
+     source
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="in_andromeda_survey" datatype="bit" name="in_andromeda_survey" ucd="meta.code.status">
+    <DESCRIPTION>
+     Flag indicating that the source is present in the Gaia Andromeda
+     Photometric Survey (GAPS)
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="classprob_dsc_combmod_quasar" datatype="float" name="classprob_dsc_combmod_quasar" ucd="stat.probability">
+    <DESCRIPTION>
+     Probability from DSC-Combmod of being a quasar (data used: BP/RP
+     spectrum, photometry, astrometry)
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="classprob_dsc_combmod_galaxy" datatype="float" name="classprob_dsc_combmod_galaxy" ucd="stat.probability">
+    <DESCRIPTION>
+     Probability from DSC-Combmod of being a galaxy (data used: BP/RP
+     spectrum, photometry, astrometry)
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="classprob_dsc_combmod_star" datatype="float" name="classprob_dsc_combmod_star" ucd="stat.probability">
+    <DESCRIPTION>
+     Probability from DSC-Combmod of being a single star (but not a
+     white dwarf) (data used: BP/RP spectrum, photometry, astrometry)
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="teff_gspphot" datatype="float" name="teff_gspphot" ucd="phys.temperature.effective" unit="K">
+    <DESCRIPTION>
+     Effective temperature from GSP-Phot Aeneas best library using
+     BP/RP spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="teff_gspphot_lower" datatype="float" name="teff_gspphot_lower" ucd="phys.temperature.effective;stat.min" unit="K">
+    <DESCRIPTION>
+     Lower confidence level (16%) of effective temperature from GSP-
+     Phot Aeneas best library using BP/RP spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="teff_gspphot_upper" datatype="float" name="teff_gspphot_upper" ucd="phys.temperature.effective;stat.max" unit="K">
+    <DESCRIPTION>
+     Upper confidence level (84%) of effective temperature from GSP-
+     Phot Aeneas best library using BP/RP spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="logg_gspphot" datatype="float" name="logg_gspphot" ucd="phys.gravity" unit="log(cm.s**-2)">
+    <DESCRIPTION>
+     Surface gravity from GSP-Phot Aeneas best library using BP/RP
+     spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="logg_gspphot_lower" datatype="float" name="logg_gspphot_lower" ucd="phys.gravity;stat.min" unit="log(cm.s**-2)">
+    <DESCRIPTION>
+     Lower confidence level (16%) of surface gravity from GSP-Phot
+     Aeneas best library using BP/RP spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="logg_gspphot_upper" datatype="float" name="logg_gspphot_upper" ucd="phys.gravity;stat.max" unit="log(cm.s**-2)">
+    <DESCRIPTION>
+     Upper confidence level (84%) of surface gravity from GSP-Phot
+     Aeneas best library using BP/RP spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="mh_gspphot" datatype="float" name="mh_gspphot" ucd="phys.abund.Z" unit="dex">
+    <DESCRIPTION>
+     Iron abundance from GSP-Phot Aeneas best library using BP/RP
+     spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="mh_gspphot_lower" datatype="float" name="mh_gspphot_lower" ucd="phys.abund.Z;stat.min" unit="dex">
+    <DESCRIPTION>
+     Lower confidence level (16%) of iron abundance from GSP-Phot
+     Aeneas best library using BP/RP spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="mh_gspphot_upper" datatype="float" name="mh_gspphot_upper" ucd="phys.abund.Z;stat.max" unit="dex">
+    <DESCRIPTION>
+     Upper confidence level (84%) of iron abundance from GSP-Phot
+     Aeneas best library using BP/RP spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="distance_gspphot" datatype="float" name="distance_gspphot" ucd="pos.distance;pos.eq" unit="pc">
+    <DESCRIPTION>
+     Distance from GSP-Phot Aeneas best library using BP/RP spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="distance_gspphot_lower" datatype="float" name="distance_gspphot_lower" ucd="pos.distance;pos.eq" unit="pc">
+    <DESCRIPTION>
+     Lower confidence level (16%) of distance from GSP-Phot Aeneas
+     best library using BP/RP spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="distance_gspphot_upper" datatype="float" name="distance_gspphot_upper" ucd="pos.distance;pos.eq" unit="pc">
+    <DESCRIPTION>
+     Upper confidence level (84%) of distance from GSP-Phot Aeneas
+     best library using BP/RP spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="azero_gspphot" datatype="float" name="azero_gspphot" ucd="phys.absorption;em.opt" unit="mag">
+    <DESCRIPTION>
+     Monochromatic extinction $A_0$ at 547.7nm from GSP-Phot Aeneas
+     best library using BP/RP spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="azero_gspphot_lower" datatype="float" name="azero_gspphot_lower" ucd="phys.absorption;em.opt" unit="mag">
+    <DESCRIPTION>
+     Lower confidence level (16%) of monochromatic extinction $A_0$ at
+     547.7nm from GSP-Phot Aeneas best library using BP/RP spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="azero_gspphot_upper" datatype="float" name="azero_gspphot_upper" ucd="phys.absorption;em.opt" unit="mag">
+    <DESCRIPTION>
+     Upper confidence level (84%) of monochromatic extinction $A_0$ at
+     547.7nm from GSP-Phot Aeneas best library using BP/RP spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ag_gspphot" datatype="float" name="ag_gspphot" ucd="phys.absorption;em.opt" unit="mag">
+    <DESCRIPTION>
+     Extinction in G band from GSP-Phot Aeneas best library using
+     BP/RP spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ag_gspphot_lower" datatype="float" name="ag_gspphot_lower" ucd="phys.absorption;em.opt" unit="mag">
+    <DESCRIPTION>
+     Lower confidence level (16%) of extinction in G band from GSP-
+     Phot Aeneas best library using BP/RP spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ag_gspphot_upper" datatype="float" name="ag_gspphot_upper" ucd="phys.absorption;em.opt" unit="mag">
+    <DESCRIPTION>
+     Upper confidence level (84%) of extinction in G band from GSP-
+     Phot Aeneas best library using BP/RP spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ebpminrp_gspphot" datatype="float" name="ebpminrp_gspphot" ucd="phot.color.excess" unit="mag">
+    <DESCRIPTION>
+     Reddening $E(G_{\rm BP} - G_{\rm RP})$ from GSP-Phot Aeneas best
+     library using BP/RP spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ebpminrp_gspphot_lower" datatype="float" name="ebpminrp_gspphot_lower" ucd="phot.color.excess;stat.min" unit="mag">
+    <DESCRIPTION>
+     Lower confidence level (16%) of reddening  $E(G_{\rm BP} - G_{\rm
+     RP})$ from GSP-Phot Aeneas best library using BP/RP spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="ebpminrp_gspphot_upper" datatype="float" name="ebpminrp_gspphot_upper" ucd="phot.color.excess;stat.max" unit="mag">
+    <DESCRIPTION>
+     Upper confidence level (84%) of reddening  $E(G_{\rm BP} - G_{\rm
+     RP})$ from GSP-Phot Aeneas best library using BP/RP spectra
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="libname_gspphot" arraysize="*" datatype="char" name="libname_gspphot" ucd="meta.note">
+    <DESCRIPTION>
+     Name of library that achieves the highest mean log-posterior in
+     MCMC samples and was used to derive GSP-Phot parameters in this
+     table
+    </DESCRIPTION>
+   </FIELD>
+   <FIELD ID="dist" datatype="double" name="dist"/>
+   <DATA>
+    <TABLEDATA>
+     <TR>
+      <TD>1636148068921376768</TD>
+      <TD>Gaia DR3 4789864076732331648</TD>
+      <TD>4789864076732331648</TD>
+      <TD>1537933648</TD>
+      <TD>2016</TD>
+      <TD>69.31662758499185</TD>
+      <TD>0.45911273</TD>
+      <TD>-47.25268764316094</TD>
+      <TD>0.5165178</TD>
+      <TD>7.100758956026111</TD>
+      <TD>0.52452594</TD>
+      <TD>13.537479</TD>
+      <TD>140.69727</TD>
+      <TD>121.64554022827309</TD>
+      <TD>0.5740319</TD>
+      <TD>-70.69711407936788</TD>
+      <TD>0.64981335</TD>
+      <TD>-0.0077370545</TD>
+      <TD>0.34502465</TD>
+      <TD>0.009485758</TD>
+      <TD>0.090481654</TD>
+      <TD>0.18195024</TD>
+      <TD>0.23813902</TD>
+      <TD>-0.51167303</TD>
+      <TD>0.28137034</TD>
+      <TD>-0.14777644</TD>
+      <TD>-0.22096139</TD>
+      <TD>262</TD>
+      <TD>0</TD>
+      <TD>262</TD>
+      <TD>0</TD>
+      <TD>-0.8101223</TD>
+      <TD>252.68391</TD>
+      <TD>0</TD>
+      <TD>0</TD>
+      <TD>95</TD>
+      <TD>0</TD>
+      <TD/>
+      <TD>1.5331504</TD>
+      <TD>0.14090222</TD>
+      <TD>-0.036248896</TD>
+      <TD>-0.09184883</TD>
+      <TD>-0.19217344</TD>
+      <TD>-0.12727512</TD>
+      <TD>0.20658779</TD>
+      <TD>30</TD>
+      <TD>23</TD>
+      <TD>0.99918807</TD>
+      <TD>33</TD>
+      <TD>12</TD>
+      <TD>0</TD>
+      <TD>0.016796837</TD>
+      <TD>168.20538</TD>
+      <TD>0</TD>
+      <TD>0</TD>
+      <TD>0.96312565</TD>
+      <TD>0.077873945</TD>
+      <TD>0.09261617</TD>
+      <TD>0.10425211</TD>
+      <TD>0.10953399</TD>
+      <TD>-105.256134</TD>
+      <TD>66.05753</TD>
+      <TD>-41.108833</TD>
+      <TD>38.974846</TD>
+      <TD>0</TD>
+      <TD>264</TD>
+      <TD>136.29393913399107</TD>
+      <TD>0.79147965</TD>
+      <TD>172.20145</TD>
+      <TD>20.351175</TD>
+      <TD>21</TD>
+      <TD>69.58137782845998</TD>
+      <TD>11.601847</TD>
+      <TD>5.99744</TD>
+      <TD>20.73231</TD>
+      <TD>31</TD>
+      <TD>117.69224394549772</TD>
+      <TD>9.431108</TD>
+      <TD>12.479153</TD>
+      <TD>19.571026</TD>
+      <TD>1.3740422</TD>
+      <TD>0</TD>
+      <TD>0</TD>
+      <TD>0</TD>
+      <TD>1</TD>
+      <TD>0</TD>
+      <TD>1.1612835</TD>
+      <TD>0.38113403</TD>
+      <TD>0.78014946</TD>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD>NOT_AVAILABLE</TD>
+      <TD>253.3946414019159</TD>
+      <TD>-41.9631192552857</TD>
+      <TD>50.46877109619281</TD>
+      <TD>-67.87317176227522</TD>
+      <TD>0</TD>
+      <TD>0</TD>
+      <TD>0</TD>
+      <TD>0</TD>
+      <TD>0</TD>
+      <TD>0</TD>
+      <TD>0</TD>
+      <TD>0</TD>
+      <TD>0</TD>
+      <TD>0</TD>
+      <TD>0</TD>
+      <TD>6.6538375e-10</TD>
+      <TD>4.6013196e-10</TD>
+      <TD>0.99999815</TD>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD/>
+      <TD>8.500618942998781e-05</TD>
+     </TR>
+    </TABLEDATA>
+   </DATA>
+  </TABLE>
+ </RESOURCE>
+</VOTABLE>
