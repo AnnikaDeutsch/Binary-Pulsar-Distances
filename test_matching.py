@@ -1,3 +1,8 @@
+"""
+Script to run tests of all of the functions of the package, stored in eliminating.py. Use pytest documentation 
+(https://docs.pytest.org/en/7.4.x/) and codeastro resources (https://github.com/semaphoreP/codeastro/tree/main/Day4)
+to help keep testing updated
+"""
 # %%
 import astropy
 import astropy.units as u

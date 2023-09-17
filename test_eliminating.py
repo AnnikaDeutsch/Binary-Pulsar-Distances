@@ -1,23 +1,17 @@
-import astropy
+"""
+Script to run tests of some of the functions of the package. Use pytest documentation 
+(https://docs.pytest.org/en/7.4.x/) and codeastro resources (https://github.com/semaphoreP/codeastro/tree/main/Day4)
+to help keep testing updated
+"""
+
 import astropy.units as u
-import astroquery
 from astroquery.gaia import Gaia
 from astropy.coordinates import SkyCoord
 from astropy.coordinates import Angle
-import numpy as np
-import matplotlib.pyplot as plt
-from astropy.visualization import quantity_support
-from astropy.time import Time 
-import os
-from astropy.io.votable import parse_single_table
-from astropy.time import Time
-import pytest
-from astropy.table import Table, vstack
-import csv
-import pandas as pd
 
 
-def psr_to_gaia(jname, raj, raerr, decj, decerr,  pmra, pmraerr, pmdec, pmdecerr, posepoch, radius):
+
+def psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, radius):
     """Searches Gaia for possible companion to any given pulsar
 
     Given input parameters read in from a text file following the guidelines of ATNF parameters, 
@@ -40,15 +34,11 @@ def psr_to_gaia(jname, raj, raerr, decj, decerr,  pmra, pmraerr, pmdec, pmdecerr
     """
 
     from astropy.time import Time 
-    p_ra = raj # comes in as a string of units hh:mm:ss.ss, atnf ra
-    p_dec = decj # comes in as a string of units dd:mm:ss.s, atnf dec
-    p_pmra = pmra # comes in as a string of units mas/yr, atnf pmra
-    p_pmdec = pmdec # comes in as a string of units mas/yr, atnf pmdec
+    p_ra = raj # comes in as a string of units hh:mm:ss.ss
+    p_dec = decj # comes in as a string of units dd:mm:ss.s
+    p_pmra = pmra # comes in as a string of units mas/yr
+    p_pmdec = pmdec # comes in as a string of units mas/yr
     p_epoch = Time(posepoch, format='mjd').jyear # comes in in units mjd, is immediately converted to jyear tcb
-    ra_err = raerr
-    dec_err = decerr
-    pmra_err = pmraerr
-    pmdec_err = pmdecerr
 
     p_ra_ang = Angle(p_ra + ' hours') # stores the ra in hms as an Angle object
     p_dec_ang = Angle(p_dec + ' degrees') # stores the dec in dms as an Angle object
@@ -87,14 +77,13 @@ def psr_to_gaia(jname, raj, raerr, decj, decerr,  pmra, pmraerr, pmdec, pmdecerr
     Gaia.ROW_LIMIT = 2000
     Gaia.MAIN_GAIA_TABLE = "gaiadr3.gaia_source" # Select early Data Release 3
     coord=SkyCoord(ra=p_new_ra, dec=p_new_dec, unit=(u.degree, u.degree), frame='icrs')
-    
-    
+    radius = u.Quantity(radius, u.arcsec)
     width_gaia = u.Quantity(1., u.arcmin) # by default, queries in 1 arcmin range
     height_gaia = u.Quantity(1., u.arcmin) # by default, queries in 1 arcmin range
     if jname == 'J0437-4715':
         j = Gaia.cone_search_async(coordinate=coord, radius=u.Quantity(5., u.arcsec))
     else:
-        j = Gaia.cone_search_async(coordinate=coord, radius=u.Quantity(radius, u.arcsec))
+        j = Gaia.cone_search_async(coordinate=coord, radius=radius)
     results = j.get_results()
 
     # use python sort function
@@ -115,7 +104,7 @@ def get_matches(input_file, output_file, radius=1.):
 
     Args: 
         input_file (str): Name of the text file (csv) containing each pulsar with the parameters 'index', 'jname', 
-            'ra', 'raerr', 'dec', 'decerr', 'pmra', 'pmraerr', 'pmdec', 'pmdecerr', 'posepoch', 'dm' row by row for each object.
+            'ra', 'dec', 'pmra', 'pmdec', 'posepoch' row by row for each object.
         output_file (str): Name of the text file which the pulsar-gaia matches will be output to. If desired,
             specify the full path to which the file should be saved, otherwise it will just be saved to the 
             present working directory
@@ -138,13 +127,12 @@ def get_matches(input_file, output_file, radius=1.):
       # Parse input
       values = line.split(';')
 
-      if values[2] == '*' or values[4] == '*' or values[6] == '*' or values[8] == '*':
+      if values[2] == '*' or values[3] == '*' or values[4] == '*' or values[5] == '*' or values[6] == '*':
         skipped += 1
         continue
 
       # Add result to supertable
-      #psr_to_gaia(jname, raj, raerr, decj, decerr,  pmra, pmraerr, pmdec, pmdecerr, posepoch, radius)
-      search_result = psr_to_gaia(values[1],values[2],values[3],values[4],values[5],values[6],values[7],values[8],values[9],values[10],radius)
+      search_result = psr_to_gaia(values[1],values[2],values[3],values[4],values[5],values[6],radius)
       if (len(search_result) == 0):
         continue
       if first_time:
@@ -183,11 +171,11 @@ def check_binary(input_file, output_file):
     count = 1
     for line in f:
         values = line.split(';')
-        while len(values) - 1 > 13:
+        while len(values) - 1 > 11:
             values.pop()
-        if values[13] != "*": # parameter of whether binary or not 
+        if values[11] != "*":
             values[0] = count
-            values[13] = values[13].replace('\n',';')
+            values[11] = values[11].replace('\n',';')
             if first_time:
                 new.insert(0, values)
                 first_time = False
@@ -243,7 +231,6 @@ def check_pos_uncertainty(input_file, output_file):
                 dec_err = values[7].split('e')
             else:
                 ra_err = [0,-1]
-            print(ra_err)
             if int(ra_err[1]) < 0:
                 if int(dec_err[1]) < 0:
                     values.pop(21)
@@ -252,9 +239,9 @@ def check_pos_uncertainty(input_file, output_file):
                     values.pop(14)
                     values.pop(11)
                     values.pop(8)
-                    # values.pop(7) # don't want to remove error in dec
+                    values.pop(7)
                     values.pop(5)
-                    # values.pop(4) # don't want to remove error in ra
+                    values.pop(4)
                     values.pop(2)
                     values[0] = count 
                     # values[9] = values[9].replace('\n',';')
@@ -300,9 +287,9 @@ def check_in_globular(input_file, output_file):
     for line in f:
         not_match = True
         values = line.split(';')
-        while len(values) - 1 > 11:
+        while len(values) - 1 > 9:
             values.pop()
-        g = open('/home/annika_deutsch/Binary-Pulsar-Distances/Binary_Pulsar_Distances/gc_pulsar_names.csv', 'r')
+        g = open('/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/gc_pulsar_names.csv', 'r')
         for line in g:
             check = line.split()
             if values[1] == check[0]:
@@ -321,7 +308,7 @@ def check_in_globular(input_file, output_file):
         write.writerows(new)
 
 
-
+# now write this into a function to do it for any given pulsar
 def pretty_print(pulsar, source_id, filename, no_glob):
     """Prints attributes of the pulsar/match pair in a readable format.
 
@@ -377,9 +364,68 @@ def pretty_print(pulsar, source_id, filename, no_glob):
     g.close()
 
 
+class TestBinaryCheck:
+
+    def test_eliminates_all_not_binaries(self):
+        """
+        Tests that, given a small file with a known number of pulsars not in binaries,
+        the function check_binary() eliminates all of the isolated pulsars and keeps
+        all of the binary pulsars.
+        """
+
+        input_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/binary_test/e1_input.csv'
+        output_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/binary_test/e1_output.csv'
+        check_binary(input_file, output_file)
+
+        count = 0
+        f = open(output_file,'r')
+        for line in f:
+            count += 1
+
+        assert count == 2
+
+class TestPosUncertaintyCheck:
+
+    def test_pos_uncerainty_check(self):
+        """
+        Tests that, given a small file (e2_input.csv) with 2 acceptable and 2 unacceptable position
+        uncertainty, the resulting output file has only 2 entries.
+        """
+
+        input_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/pos_unc_test/e2_input.csv'
+        output_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/pos_unc_test/e2_output.csv'
+        check_pos_uncertainty(input_file, output_file)
+
+        count = 0
+        f = open(output_file,'r')
+        for line in f:
+            count += 1
+        
+        assert count == 2
+
+class TestInGlobularCheck:
+
+    def test_in_globular_check(self):
+        """
+        Tests that, given a file with 2 pulsars not in globular clusters and 1 pulsar in a 
+        globular cluster, the 1 pulsar in the globular is removed and a file with the 2 remaining 
+        pulsars is created.
+        """
+
+        input_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/globular_test/e3_input.csv'
+        output_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/globular_test/e3_output.csv'
+
+        check_in_globular(input_file, output_file)
+
+        count = 0
+        f = open(output_file, 'r')
+        for line in f:
+            count += 1
+
+        assert count == 2
 
 def matching_pipeline(input_file, output_file, no_pos, no_bin, no_glob, match_all_params, radius=1., 
-                      pretty_print= False, remove_bin= False):
+                      pretty_print= False):
     """Carries out the identification of sources from a list of pulsars to a list potential Gaia matches.
 
     Takes as input a text file of the ATNF format "long with errors", and runs through each step of the source
@@ -407,13 +453,9 @@ def matching_pipeline(input_file, output_file, no_pos, no_bin, no_glob, match_al
     
     """
     check_pos_uncertainty(input_file, no_pos)
-    if remove_bin: 
-        check_binary(no_pos, no_bin)
-        check_in_globular(no_bin, no_glob)
-        get_matches(no_glob, match_all_params, radius= radius)
-    else: 
-        check_in_globular(no_pos, no_glob)
-        get_matches(no_glob, match_all_params, radius= radius)
+    check_binary(no_pos, no_bin)
+    check_in_globular(no_bin, no_glob)
+    get_matches(no_glob, match_all_params, radius= radius)
 
     # script to create an updated version of all_final.csv with only the parameters we wanna look at
 
@@ -462,17 +504,34 @@ def matching_pipeline(input_file, output_file, no_pos, no_bin, no_glob, match_al
                 pretty_print(values[0], values[1], filename, no_glob)
 
 
-# os.chdir('\home\annika_deutsch\Binary-Pulsar-Distances\Binary_Pulsar_Distances')
-print(os.getcwd())
-print(os.listdir())
+class TestMatchingPipeline:
 
-matching_pipeline('10_3_3as_input.csv', 
-                  '10_3_3as_output.csv', 
-                  '10_3_3as_nopos.csv', 
-                  '10_3_3as_nobin.csv', 
-                  '10_3_3as_noglob.csv',
-                  '10_3_3as_allparams.csv', 
-                  radius= 3.)
+    def test_on_all_in_atnf_with_DR2(self):
+        """
+        Tests that the matching pipeline, wrapped into the function matching_pipeline(), returns the proper
+        set of gaia matches.
+        """
+
+        input_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/all_atnf.csv'
+        output_file = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/matching_pipeline_test/t1_output.csv'
+        no_pos = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/matching_pipeline_test/t1_nopos.csv'
+        no_bin = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/matching_pipeline_test/t1_no_bin.csv'
+        no_glob = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/matching_pipeline_test/t1_noglob.csv'
+        match_all_params = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/matching_pipeline_test/t1_matchall.csv'
+
+        matching_pipeline(input_file, output_file, no_pos, no_bin, no_glob, match_all_params)
+
+        f = open(output_file, 'r')
+        count = 0
+        for line in f:
+            count += 1
+
+        index = 0
+        g = open('/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/all_final_short.csv', 'r')
+        for line in g:
+            index += 1
+
+        assert count == index
 
 
 
