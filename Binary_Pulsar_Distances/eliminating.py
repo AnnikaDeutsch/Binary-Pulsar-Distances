@@ -25,6 +25,7 @@ import pytest
 from astropy.table import Table, vstack
 import csv
 import pandas as pd
+from astropy.time import Time 
 
 
 def psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, binary, bincomp, radius):
@@ -49,7 +50,6 @@ def psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, binary, bincomp, radiu
         results (Table): results of the Gaia query in an astropy Table  
     """
 
-    from astropy.time import Time 
     p_pmra = u.Quantity(pmra, u.mas/u.yr) # comes in as a string of units mas/yr
     p_pmdec = u.Quantity(pmdec, u.mas/u.yr) # comes in as a string of units mas/yr
     p_epoch = Time(posepoch, format='mjd').jyear # comes in in units mjd, is immediately converted to jyear tcb
@@ -77,24 +77,13 @@ def psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, binary, bincomp, radiu
     results = j.get_results()
 
     # use python sort function
-    if len(results) == 0:
-        # with open('/home/annika_deutsch/Binary-Pulsar-Distances/Binary_Pulsar_Distances/matches_10arcsec.csv', 'a') as fd:
-        #     fd.write(jname + ',\n')
-        #     fd.close()
-        return results
-    else:
-        results.add_column(jname, name='Companion Pulsar', index=0)
-        results.add_column(raj, name='Pulsar RA', index=1)
-        results.add_column(decj, name='Pulsar DEC', index=2)
-        results.add_column(binary, name='Binary', index=3)
-        results.add_column(bincomp, name='Binary Companion', index=4)
-        results.write('temp.csv', overwrite=True) #writes the results of a single query to a csv file
-        # f = open('temp.csv', 'r')
-        # for line in f:
-        #     with open('/home/annika_deutsch/Binary-Pulsar-Distances/Binary_Pulsar_Distances/matches_10arcsec.csv', 'a') as fd:
-        #         fd.write(line)
-        #         fd.close()
-        return results
+    results.add_column(jname, name='Companion Pulsar', index=0)
+    results.add_column(raj, name='Pulsar RA', index=1)
+    results.add_column(decj, name='Pulsar DEC', index=2)
+    results.add_column(binary, name='Binary', index=3)
+    results.add_column(bincomp, name='Binary Companion', index=4)
+    
+    return results
     
 
 def psr_to_gaia_nominal(jname, raj, decj, radius):
@@ -158,52 +147,45 @@ def get_matches(input_file, radius=1.):
     # Loop through file of ATNF data and combine tables of Gaia matches into one supertable
     for line in f:
 
-      # Parse input
-      values = line.split(';')
-      
-      jname = values[1]
-      ra = values[3]
-      ra_err = values[4]
-      dec = values[6]
-      dec_err = values[7]
-      pmra = values[9]
-      pmra_err = values[10]
-      pmdec = values[12]
-      pmdec_err = values[13]
-      posepoch = values[15]
-      binary = values[17]
-      bincomp = values[19]
+        # Parse input
+        values = line.split(';')
+        
+        jname = values[1]
+        ra = values[3]
+        ra_err = values[4]
+        dec = values[6]
+        dec_err = values[7]
+        pmra = values[9]
+        pmra_err = values[10]
+        pmdec = values[12]
+        pmdec_err = values[13]
+        posepoch = values[15]
+        binary = values[17]
+        bincomp = values[19]
 
-      if ra == '*' or ra_err == '*' or dec == '*' or dec_err == '*' or pmra == '*' or pmra_err == '*' or pmdec == '*' or pmdec_err == '*' or posepoch == '*':
-        skipped += 1
-        # with open('/home/annika_deutsch/Binary-Pulsar-Distances/Binary_Pulsar_Distances/matches_10arcsec.csv', 'a') as fd:
-        #   fd.write(values[1] + ',\n')
-        #   fd.close()
-        continue
+        if ra == '*' or ra_err == '*' or dec == '*' or dec_err == '*' or pmra == '*' or pmra_err == '*' or pmdec == '*' or pmdec_err == '*' or posepoch == '*':
+            skipped += 1
+            continue
 
-      # write a condition that will perform the query if that pulsar is not in the table, and will skip if it is
-      query = True
-      g = open('/home/billee/Binary-Pulsar-Distances/Binary_Pulsar_Distances/matches_10arcsec.csv', 'r')
-      for line in g:
-        name = line.split(',')
-        if name[0] == jname:
-          query = False
-          break
-      
-      if query:
-        # Add result to supertable
+        # write a condition that will perform the query if that pulsar is not in the table, and will skip if it is
+        
         search_result = psr_to_gaia(jname,ra,dec,pmra,pmdec,posepoch,binary,bincomp,radius)
         if (len(search_result) == 0):
-          continue
+            continue
         if first_time:
-          results = search_result
-          first_time = False
+            results = search_result
+            first_time = False
         else:  
-          results = vstack([results, search_result])
+            results = vstack([results, search_result])
 
     hits = len(results)
     # results.write(output_file, format='csv', overwrite=True)
     return results, hits, skipped
+
+def save_npz(filename, table):
+    file = filename 
+    np.savez(file, table)
+
 
 
 def check_binary(input_file, output_file):
