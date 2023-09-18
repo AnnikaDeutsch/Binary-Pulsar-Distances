@@ -1,3 +1,13 @@
+"""
+Created June 2022
+
+@author: Annika Deutsch
+@date: 06/2022
+@title: eliminating.py
+@description: This python script holds all the function definitions of the package PSRmatch.
+"""
+
+
 import astropy
 import astropy.units as u
 import astroquery
@@ -20,9 +30,9 @@ import pandas as pd
 def psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, radius):
     """Searches Gaia for possible companion to any given pulsar
 
-    Given input parameters read in from a text file following the guidelines of ATNF parameters, 
-    queries Gaia DR2 to find matches (nearby objects from Gaia) based on RA and Dec for each object 
-    from the text file to within a certain range, the default being 1 arcmin in both ra and dec.
+    Given input ATNF parameters for a single pulsar, 
+    query Gaia to find Gaia objects near that pulsar based on RA and DEC. Returns 
+    Gaia query results in a table and writes them to a text file
 
     Args:
         jname (str): Name of the pulsar being checked for matches 
@@ -36,60 +46,75 @@ def psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, radius):
         radius (float): Radius of the Gaia cone search in arcminutes
     
     Returns:
-        Table: results of the Gaia query in an astropy Table  
+        results (Table): results of the Gaia query in an astropy Table  
     """
 
     from astropy.time import Time 
-    p_ra = raj # comes in as a string of units hh:mm:ss.ss
-    p_dec = decj # comes in as a string of units dd:mm:ss.s
-    p_pmra = pmra # comes in as a string of units mas/yr
-    p_pmdec = pmdec # comes in as a string of units mas/yr
+    p_pmra = u.Quantity(pmra, u.mas/u.yr) # comes in as a string of units mas/yr
+    p_pmdec = u.Quantity(pmdec, u.mas/u.yr) # comes in as a string of units mas/yr
     p_epoch = Time(posepoch, format='mjd').jyear # comes in in units mjd, is immediately converted to jyear tcb
 
-    p_ra_ang = Angle(p_ra + ' hours') # stores the ra in hms as an Angle object
-    p_dec_ang = Angle(p_dec + ' degrees') # stores the dec in dms as an Angle object
+    psr = SkyCoord(ra= raj, dec= decj, unit= (u.hourangle, u.deg), frame = 'icrs', pm_ra_cosdec= p_pmra, pm_dec= p_pmdec)
 
-    p_ra_deg = p_ra_ang.degree * u.deg # stores the ra converted to degrees 
-    p_dec_deg = p_dec_ang.degree * u.deg # stores the dec converted to degrees
-
-    # first create variables for the pm units as they come in from atnf, mas/yr
-    pmra_masyr = float(p_pmra) * u.mas / u.yr
-    pmdec_masyr = float(p_pmdec) * u.mas /u.yr
-
-    # then convert to variable that represent the pms in deg/yr
-    pmra_degyr = pmra_masyr.to(u.deg / u.yr)
-    pmdec_degyr = pmdec_masyr.to(u.deg / u.yr)
-
-    # to propogate location of pulsar up to gaia time, must calculate epoch difference
+    # calculate epoch difference
     gaia_epoch = Time('2016.0', format='jyear').jyear
     year_diff = (gaia_epoch.tolist() * u.yr) - (p_epoch.tolist() * u.yr) # difference b/w epochs in years
 
-    # get the new ra and dec for the pulsar by updating to gaia epoch 
-    p_new_ra = p_ra_deg + (pmra_degyr * year_diff) #   CHANGE BACK TO PMRA_DEGYR WHEN DONE
-    p_new_dec = p_dec_deg + (pmdec_degyr * year_diff)#   CHANGE BACK TO PMDEC_DEGYR WHEN DONE
+    # pm times the time diff
+    pmtransra = psr.pm_ra_cosdec * year_diff
+    pmtransdec = psr.pm_dec * year_diff
 
-    print(p_new_ra)
-    print(p_new_dec)
+    ra_dr3 = psr.ra.to_value(u.mas) * u.mas + (pmtransra)
+    dec_dr3 = psr.dec.to_value(u.mas) * u.mas + (pmtransdec)
 
-    # ra_ext_pos = raj + rajerr + (pmra + pmraerr)*year_diff
-    # ra_ext_neg = raj - rajerr + (pmra - pmraerr)*year_diff
-
-    # dec_ext_pos = decj + decjerr + (pmdec + pmdecerr)*year_diff
-    # dec_ext_neg = decj - decjerr + (pmdec - pmdecerr)*year_diff
-
-
+    # new SkyCoord object with the propagated positions
+    psr_dr3 = SkyCoord(ra= ra_dr3, dec= dec_dr3, unit= (u.mas, u.mas), frame= 'icrs', pm_ra_cosdec= p_pmra, pm_dec= p_pmdec)
 
     # Query Gaia within the range of the given pulsar 
     Gaia.ROW_LIMIT = 2000
-    Gaia.MAIN_GAIA_TABLE = "gaiadr3.gaia_source" # Select early Data Release 3
-    coord=SkyCoord(ra=p_new_ra, dec=p_new_dec, unit=(u.degree, u.degree), frame='icrs')
-    radius = u.Quantity(5, u.arcsec)
-    width_gaia = u.Quantity(1., u.arcmin) # by default, queries in 1 arcmin range
-    height_gaia = u.Quantity(1., u.arcmin) # by default, queries in 1 arcmin range
-    if jname == 'J0437-4715':
-        j = Gaia.cone_search_async(coordinate=coord, radius=u.Quantity(5., u.arcsec))
+    Gaia.MAIN_GAIA_TABLE = "gaiadr3.gaia_source" # Select eDR3
+    j = Gaia.cone_search_async(coordinate=psr_dr3, radius=u.Quantity(radius, u.arcsec))
+    results = j.get_results()
+
+    # use python sort function
+    if len(results) == 0:
+        # with open('/home/annika_deutsch/Binary-Pulsar-Distances/Binary_Pulsar_Distances/matches_10arcsec.csv', 'a') as fd:
+        #     fd.write(jname + ',\n')
+        #     fd.close()
+        return results
     else:
-        j = Gaia.cone_search_async(coordinate=coord, radius=radius)
+        results.add_column(jname, name='Companion Pulsar', index=0)
+        results.add_column(raj, name='Pulsar RA', index=1)
+        results.add_column(decj, name='Pulsar DEC', index=2)
+        results.write('temp.csv', overwrite=True) #writes the results of a single query to a csv file
+        # f = open('temp.csv', 'r')
+        # for line in f:
+        #     with open('/home/annika_deutsch/Binary-Pulsar-Distances/Binary_Pulsar_Distances/matches_10arcsec.csv', 'a') as fd:
+        #         fd.write(line)
+        #         fd.close()
+        return results
+    
+
+def psr_to_gaia_nominal(jname, raj, decj, radius):
+    """
+        Looks for Gaia matches to a single pulsar within a specified radius, and returns the table resulting 
+        from the Gaia query with the psr name, ra and dec. A simpler version of psr_to_gaia().
+
+        Args:
+            jname (str): Name of the pulsar being checked for matches 
+            raj (str): Right ascension of the pulsar in hh:mm:ss.ss format -- is this actually what it is?
+            decj (str): Declination of the pulsar in degrees:mm:ss.ss format -- is this actually what it is?
+            radius (float): Radius of the Gaia cone search in arcminutes
+    
+        Returns:
+            Table: results of the Gaia query in an astropy Table 
+    """
+    
+    # Query Gaia within the range of the given pulsar 
+    Gaia.ROW_LIMIT = 2000
+    Gaia.MAIN_GAIA_TABLE = "gaiadr3.gaia_source" # Select early Data Release 3
+    sc = SkyCoord(ra= raj, dec= decj, frame= 'icrs', unit=(u.hourangle, u.deg))
+    j = Gaia.cone_search_async(coordinate=sc, radius=u.Quantity(radius, u.arcsec))
     results = j.get_results()
 
     # use python sort function
@@ -98,26 +123,27 @@ def psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, radius):
         return results
     else:
         results.add_column(jname, name='Companion Pulsar', index=0)
+        results.add_column(raj, name='Pulsar RA', index=1)
+        results.add_column(decj, name='Pulsar DEC', index=2)
         return results
 
 
-def get_matches(input_file, output_file, radius=1.):
+
+def get_matches(input_file, radius=1.):
     """Takes a list of pulsars and returns a list of those with potential matches.
 
-    Takes as input a text file (.csv file) with index number, name, ra, dec, proper
-    motion ra, proper motion dec and posepoch of a list of pulsars and produces all of the gaia 
+    Takes as input a text file containing parameters of a list of pulsars, and produces all of the gaia 
     matches of ra and dec to within a certain range.
 
     Args: 
         input_file (str): Name of the text file (csv) containing each pulsar with the parameters 'index', 'jname', 
             'ra', 'dec', 'pmra', 'pmdec', 'posepoch' row by row for each object.
-        output_file (str): Name of the text file which the pulsar-gaia matches will be output to. If desired,
-            specify the full path to which the file should be saved, otherwise it will just be saved to the 
-            present working directory
-        height (:obj:'float', optional): Height of the rectangle Gaia will query in.
-        width (:obj:'float', optional): Width of the rectangle Gaia will query in.
         radius (:obj:'float', optional): Radius of the circle Gaia will query in. 
 
+    Returns:
+        results (Table): Results of Gaia queries for all pulsars in input list, as an astropy table
+        hits (int): Total number of Gaia objects returned for the pulsar list cross-matched to a certain radius
+        skipped (int): Total number of pulsars skipped in the input list due to lack of information
 
     """
     from astropy.table import Table, vstack
@@ -132,24 +158,49 @@ def get_matches(input_file, output_file, radius=1.):
 
       # Parse input
       values = line.split(';')
+      
+      jname = values[1]
+      ra = values[3]
+      ra_err = values[4]
+      dec = values[6]
+      dec_err = values[7]
+      pmra = values[9]
+      pmra_err = values[10]
+      pmdec = values[12]
+      pmdec_err = values[13]
+      posepoch = values[15]
 
-      if values[2] == '*' or values[3] == '*' or values[4] == '*' or values[5] == '*' or values[6] == '*':
+      if ra == '*' or ra_err == '*' or dec == '*' or dec_err == '*' or pmra == '*' or pmra_err == '*' or pmdec == '*' or pmdec_err == '*' or posepoch == '*':
         skipped += 1
+        # with open('/home/annika_deutsch/Binary-Pulsar-Distances/Binary_Pulsar_Distances/matches_10arcsec.csv', 'a') as fd:
+        #   fd.write(values[1] + ',\n')
+        #   fd.close()
         continue
 
-      # Add result to supertable
-      # psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, radius)
-      search_result = psr_to_gaia(values[1],values[2],values[3],values[4],values[5],values[6],radius)
-      if (len(search_result) == 0):
-        continue
-      if first_time:
-        results = search_result
-        first_time = False
-      else:  
-        results = vstack([results, search_result])
+      # write a condition that will perform the query if that pulsar is not in the table, and will skip if it is
+      query = True
+      g = open('/home/billee/Binary-Pulsar-Distances/Binary_Pulsar_Distances/matches_10arcsec.csv', 'r')
+      for line in g:
+        name = line.split(',')
+        if name[0] == jname:
+          query = False
+          break
+      
+      if query:
+        # Add result to supertable
+        #psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, radius)
+        search_result = psr_to_gaia(jname,ra,dec,pmra,pmdec,posepoch,radius)
+        if (len(search_result) == 0):
+          continue
+        if first_time:
+          results = search_result
+          first_time = False
+        else:  
+          results = vstack([results, search_result])
 
-    results.write(output_file, format='csv', overwrite=True)
-    return skipped
+    hits = len(results)
+    # results.write(output_file, format='csv', overwrite=True)
+    return results, hits, skipped
 
 
 def check_binary(input_file, output_file):
@@ -168,10 +219,6 @@ def check_binary(input_file, output_file):
     
 
     """
-
-    from astropy.table import Table, vstack
-    import csv
-
     f = open(input_file, 'r')
     first_time = True
     new = []
@@ -189,8 +236,6 @@ def check_binary(input_file, output_file):
             else:
                 new.append(values)
             count += 1
-
-# == 'MS' or values[7] == 'NS' or values[7] == 'CO' or values[7] == 'He' or values[7] == 'UL' or values[7] == 'ELL1'
     
     with open(output_file, 'w') as g:
         write = csv.writer(g, delimiter=';')
@@ -316,6 +361,29 @@ def check_in_globular(input_file, output_file):
         write.writerows(new)
 
 
+def gc_psr_names():
+    """
+    Gets the names of the pulsars in globular clusters from 'gc_pulsars.csv' and
+    saves them in the csv file 'gc_pulsar_names.csv'.
+    """
+    j = open('gc_pulsars.csv','r')
+    keep = []
+    first_time = True
+    for line in j:
+        values = line.split()
+        if first_time:
+            keep.insert(0,values[0])
+        else:
+            keep.append(values[0])
+
+    df = pd.DataFrame(keep)
+    df.to_csv('gc_pulsar_names.csv', index=False)
+
+    with open('gc_pulsar_names.csv', 'w') as g:
+        write = csv.writer(g)
+        write.writerows(keep)
+
+
 
 def pretty_print(pulsar, source_id, filename, no_glob):
     """Prints attributes of the pulsar/match pair in a readable format.
@@ -374,12 +442,12 @@ def pretty_print(pulsar, source_id, filename, no_glob):
 
 
 def matching_pipeline(input_file, output_file, no_pos, no_bin, no_glob, match_all_params, radius=1., 
-                      pretty_print= False):
+                      pretty_print= False, remove_bin= False):
     """Carries out the identification of sources from a list of pulsars to a list potential Gaia matches.
 
     Takes as input a text file of the ATNF format "long with errors", and runs through each step of the source
     identification to produce a list of potential Gaia matches and some or all of their associated Gaia 
-    parameters. Pretty print allows the output to be printed in a slightly (only slightly) more readable 
+    parameters. Pretty print allows the output to be printed in a more readable 
     and user-friendly format. 
 
     Args:
@@ -402,9 +470,13 @@ def matching_pipeline(input_file, output_file, no_pos, no_bin, no_glob, match_al
     
     """
     check_pos_uncertainty(input_file, no_pos)
-    check_binary(no_pos, no_bin)
-    check_in_globular(no_bin, no_glob)
-    get_matches(no_glob, match_all_params, radius= radius)
+    if remove_bin: 
+        check_binary(no_pos, no_bin)
+        check_in_globular(no_bin, no_glob)
+        get_matches(no_glob, match_all_params, radius= radius)
+    else: 
+        check_in_globular(no_pos, no_glob)
+        get_matches(no_glob, match_all_params, radius= radius)
 
     # script to create an updated version of all_final.csv with only the parameters we wanna look at
 
@@ -451,53 +523,3 @@ def matching_pipeline(input_file, output_file, no_pos, no_bin, no_glob, match_al
                 continue
             else:
                 pretty_print(values[0], values[1], filename, no_glob)
-
-
-#os.chdir('\home\annika_deutsch\Binary-Pulsar-Distances\Binary_Pulsar_Distances')
-print(os.getcwd())
-print(os.listdir())
-
-# matching_pipeline('10_3_3as_input.csv', 
-#                   '10_3_3as_output.csv', 
-#                   '10_3_3as_nopos.csv', 
-#                   '10_3_3as_nobin.csv', 
-#                   '10_3_3as_noglob.csv',
-#                   '10_3_3as_allparams.csv')
-
-# get_matches('psr_superset.csv','psr_superset_output.csv', radius=5.)
-
-c = open('psr_superset_output.csv', 'r')
-new = []
-first_time = True
-for line in c:
-    values = line.split(',')
-    values.pop(95)
-    count = 0 
-    while count < 40:
-        values.pop(91-count)
-        count += 1
-    index = 0
-    while index < 30:
-        values.pop(50-index)
-        index += 1
-    values.pop(12)
-    values.pop(9)
-    values.pop(8)
-    values.pop(7)
-    values.pop(6)
-    values.pop(5)
-    values.pop(4)
-    values.pop(2)
-    values.pop(1)
-    values.pop()
-    if first_time:
-        new.insert(0,values)
-        first_time = False
-    else:
-        new.append(values)
-import csv
-with open('psr_superset_final.csv', 'w') as h:
-    write = csv.writer(h, delimiter=';')
-    write.writerows(new)
-
-
