@@ -27,7 +27,7 @@ import csv
 import pandas as pd
 
 
-def psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, radius):
+def psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, binary, bincomp, radius):
     """Searches Gaia for possible companion to any given pulsar
 
     Given input ATNF parameters for a single pulsar, 
@@ -86,6 +86,8 @@ def psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, radius):
         results.add_column(jname, name='Companion Pulsar', index=0)
         results.add_column(raj, name='Pulsar RA', index=1)
         results.add_column(decj, name='Pulsar DEC', index=2)
+        results.add_column(binary, name='Binary', index=3)
+        results.add_column(bincomp, name='Binary Companion', index=4)
         results.write('temp.csv', overwrite=True) #writes the results of a single query to a csv file
         # f = open('temp.csv', 'r')
         # for line in f:
@@ -169,6 +171,8 @@ def get_matches(input_file, radius=1.):
       pmdec = values[12]
       pmdec_err = values[13]
       posepoch = values[15]
+      binary = values[17]
+      bincomp = values[19]
 
       if ra == '*' or ra_err == '*' or dec == '*' or dec_err == '*' or pmra == '*' or pmra_err == '*' or pmdec == '*' or pmdec_err == '*' or posepoch == '*':
         skipped += 1
@@ -188,8 +192,7 @@ def get_matches(input_file, radius=1.):
       
       if query:
         # Add result to supertable
-        #psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, radius)
-        search_result = psr_to_gaia(jname,ra,dec,pmra,pmdec,posepoch,radius)
+        search_result = psr_to_gaia(jname,ra,dec,pmra,pmdec,posepoch,binary,bincomp,radius)
         if (len(search_result) == 0):
           continue
         if first_time:
