@@ -77,11 +77,14 @@ def psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, binary, bincomp, radiu
     results = j.get_results()
 
     # use python sort function
-    results.add_column(jname, name='Companion Pulsar', index=0)
-    results.add_column(raj, name='Pulsar RA', index=1)
-    results.add_column(decj, name='Pulsar DEC', index=2)
-    results.add_column(binary, name='Binary', index=3)
-    results.add_column(bincomp, name='Binary Companion', index=4)
+    if len(results) == 0:
+        return results
+    else:
+        results.add_column(jname, name='Companion Pulsar', index=0)
+        results.add_column(raj, name='Pulsar RA', index=1)
+        results.add_column(decj, name='Pulsar DEC', index=2)
+        results.add_column(binary, name='Binary', index=3)
+        results.add_column(bincomp, name='Binary Companion', index=4)
     
     return results
     
@@ -137,8 +140,6 @@ def get_matches(input_file, radius=1.):
         skipped (int): Total number of pulsars skipped in the input list due to lack of information
 
     """
-    from astropy.table import Table, vstack
-
     f = open(input_file, "r")
     results = Table()
     first_time = True
@@ -166,8 +167,6 @@ def get_matches(input_file, radius=1.):
         if ra == '*' or ra_err == '*' or dec == '*' or dec_err == '*' or pmra == '*' or pmra_err == '*' or pmdec == '*' or pmdec_err == '*' or posepoch == '*':
             skipped += 1
             continue
-
-        # write a condition that will perform the query if that pulsar is not in the table, and will skip if it is
         
         search_result = psr_to_gaia(jname,ra,dec,pmra,pmdec,posepoch,binary,bincomp,radius)
         if (len(search_result) == 0):
