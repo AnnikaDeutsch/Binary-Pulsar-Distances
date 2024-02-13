@@ -25,7 +25,6 @@ import pytest
 from astropy.table import Table, vstack
 import csv
 import pandas as pd
-from astropy.time import Time 
 
 
 def psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, binary, bincomp, radius):
