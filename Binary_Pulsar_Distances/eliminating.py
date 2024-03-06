@@ -144,37 +144,42 @@ def get_matches(input_file, radius=1.):
     first_time = True
     skipped = 0
 
+    line_number = 0
+
     # Loop through file of ATNF data and combine tables of Gaia matches into one supertable
     for line in f:
 
-        # Parse input
-        values = line.split(';')
-        
-        jname = values[1]
-        ra = values[3]
-        ra_err = values[4]
-        dec = values[6]
-        dec_err = values[7]
-        pmra = values[9]
-        pmra_err = values[10]
-        pmdec = values[12]
-        pmdec_err = values[13]
-        posepoch = values[15]
-        binary = values[17]
-        bincomp = values[19]
+        if line_number > 1:
+            # Parse input
+            values = line.split(';')
+            
+            jname = values[1]
+            ra = values[3]
+            ra_err = values[4]
+            dec = values[6]
+            dec_err = values[7]
+            pmra = values[9]
+            pmra_err = values[10]
+            pmdec = values[12]
+            pmdec_err = values[13]
+            posepoch = values[15]
+            binary = values[17]
+            bincomp = values[19]
 
-        if ra == '*' or ra_err == '*' or dec == '*' or dec_err == '*' or pmra == '*' or pmra_err == '*' or pmdec == '*' or pmdec_err == '*' or posepoch == '*':
-            skipped += 1
-            continue
+            if ra == '*' or ra_err == '*' or dec == '*' or dec_err == '*' or pmra == '*' or pmra_err == '*' or pmdec == '*' or pmdec_err == '*' or posepoch == '*':
+                skipped += 1
+                continue
+            
+            search_result = psr_to_gaia(jname,ra,dec,pmra,pmdec,posepoch,binary,bincomp,radius)
+            if (len(search_result) == 0):
+                continue
+            if first_time:
+                results = search_result
+                first_time = False
+            else:  
+                results = vstack([results, search_result])
         
-        search_result = psr_to_gaia(jname,ra,dec,pmra,pmdec,posepoch,binary,bincomp,radius)
-        if (len(search_result) == 0):
-            continue
-        if first_time:
-            results = search_result
-            first_time = False
-        else:  
-            results = vstack([results, search_result])
+        line_number += 1
 
     hits = len(results)
     # results.write(output_file, format='csv', overwrite=True)
