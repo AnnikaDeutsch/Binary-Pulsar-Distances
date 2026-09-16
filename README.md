@@ -13,11 +13,13 @@ pulsars.
 
 The end goal is to use confirmed companions to improve distance estimates for the pulsars, since Gaia parallaxes
 are often better constrained than pulsar-timing or dispersion-measure-based distances. **Project status:**
-position-based cross-matching against Gaia DR3 is implemented (`Binary_Pulsar_Distances/eliminating.py`);
-confirming matches by proper-motion agreement and turning confirmed matches into distance estimates are in
-progress. The longer-term goal is to generalize the pipeline to cross-match other pulsar catalogues (e.g. the
-MeerKAT Thousand Pulsar Array) against other optical surveys (e.g. PanSTARRS, OGLE), not just ATNF against Gaia.
-See `CLAUDE.md` for the full current status and roadmap.
+the full pipeline is implemented: position-based cross-matching against Gaia DR3, confirming candidates by
+proper-motion agreement (`confirm_proper_motion`), and comparing Gaia-based distances
+(`add_gaia_distance`) against DM-based distances (`add_dm_distance`, via the `pygedm` YMW16 model). Producing
+and writing up results across a full pulsar sample is in progress. The longer-term goal is to generalize the
+pipeline to cross-match other pulsar catalogues (e.g. the MeerKAT Thousand Pulsar Array) against other optical
+surveys (e.g. PanSTARRS, OGLE), not just ATNF against Gaia. See `CLAUDE.md` for the full current status and
+roadmap.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -36,6 +38,15 @@ See `CLAUDE.md` for the full current status and roadmap.
    ```sh
    pip install -e .
    ```
+
+**Note on `pygedm`:** it compiles a C extension (the YMW16 Galactic
+electron-density model) and can be finicky. If `pip install pygedm` fails to
+build, or imports but raises `ModuleNotFoundError: No module named
+'pkg_resources'` or `AttributeError: module 'scipy.integrate' has no
+attribute 'simps'`, try installing it in a dedicated environment with
+`pip install "setuptools<81" "scipy<1.14" pygedm` (newer `setuptools`/`scipy`
+removed APIs `pygedm` still relies on). `add_dm_distance()` is the only
+function in this package that needs `pygedm`; everything else works without it.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
