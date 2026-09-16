@@ -286,23 +286,22 @@ def check_in_globular(input_file, output_file):
     """
     import csv
 
+    package_dir = os.path.dirname(os.path.abspath(__file__))
+    gc_names_path = os.path.join(package_dir, 'gc_pulsar_names.csv')
+    with open(gc_names_path, 'r') as g:
+        gc_names = {line.split()[0] for line in g if line.strip()}
+
     f = open(input_file, 'r')
     first_time = True
     new = []
     count = 1
     for line in f:
-        not_match = True
-        values = line.split(';')
+        values = line.rstrip('\n').split(';')
         while len(values) - 1 > 9:
             values.pop()
-        g = open('/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/gc_pulsar_names.csv', 'r')
-        for line in g:
-            check = line.split()
-            if values[1] == check[0]:
-                not_match = False
+        not_match = values[1] not in gc_names
         if not_match:
             values[0] = count
-            #values[9] = values[9].replace('\n','')
             if first_time:
                 new.insert(0,values)
                 first_time = False
