@@ -5,11 +5,19 @@
 ## About PSRmatch
 This package, PSRmatch, cross matches pulsars with Gaia to identify pulsar binary companions that are typically
 detectable in the Gaia (optical) wavelengths. It does this by taking in a list of pulsars, running them through
-a number of criteria to look at only those potentially useful in pulsar timing, searching in a small radius
-around the positions of each of the remaining pulsars, and gives back a list of any Gaia sources to result
-from this search. These sources are potentially binary companions to some of the original input pulsars. 
-Further checks can be performed on these output matches, comparing the astrometric parameters of the Gaia sources
-to known parameters of certain pulsar companions, such as G-band magnitude. 
+a number of criteria to look at only those potentially useful in pulsar timing (position uncertainty, binary
+status, not in a globular cluster), searching in a small radius around the positions of each of the remaining
+pulsars (propagated to the Gaia epoch using each pulsar's proper motion), and gives back a list of any Gaia DR3
+sources found in that search. These sources are potentially binary companions to some of the original input
+pulsars.
+
+The end goal is to use confirmed companions to improve distance estimates for the pulsars, since Gaia parallaxes
+are often better constrained than pulsar-timing or dispersion-measure-based distances. **Project status:**
+position-based cross-matching against Gaia DR3 is implemented (`Binary_Pulsar_Distances/eliminating.py`);
+confirming matches by proper-motion agreement and turning confirmed matches into distance estimates are in
+progress. The longer-term goal is to generalize the pipeline to cross-match other pulsar catalogues (e.g. the
+MeerKAT Thousand Pulsar Array) against other optical surveys (e.g. PanSTARRS, OGLE), not just ATNF against Gaia.
+See `CLAUDE.md` for the full current status and roadmap.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -18,21 +26,28 @@ to known parameters of certain pulsar companions, such as G-band magnitude.
 1. Clone the repo
    ```sh
    git clone https://github.com/AnnikaDeutsch/Binary-Pulsar-Distances.git
+   cd Binary-Pulsar-Distances
    ```
-3. Install dependencies
+2. Install dependencies
    ```sh
    pip install -r requirements.txt
    ```
-4. Install the package
-   ```js
-   pip install psrmatch
+3. Install the package (editable, so local changes are picked up immediately)
+   ```sh
+   pip install -e .
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Documentation
 
-Documentation can be accessed here: file://wsl.localhost/Ubuntu/home/annika_deutsch/Binary-Pulsar-Distances/docs/_build/html/index.html
+Documentation is built with Sphinx and is not currently hosted anywhere public. To build and view it locally:
+```sh
+pip install sphinx sphinx-rtd-theme
+cd docs
+make html
+open _build/html/index.html
+```
 
 <!-- LICENSE -->
 ## License
