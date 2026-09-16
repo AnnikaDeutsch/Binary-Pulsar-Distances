@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'Pulsar Companion Search'
+project = 'PSRmatch'
 copyright = '2022, Annika and Michelle'
 author = 'Annika and Michelle'
 root_doc = 'index'
