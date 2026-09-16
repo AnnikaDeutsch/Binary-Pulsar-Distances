@@ -3,4 +3,6 @@ astroquery
 matplotlib
 numpy
 pandas
+# pygedm compiles a C extension (YMW16); if it fails to build, see CLAUDE.md
+pygedm
 pytest
