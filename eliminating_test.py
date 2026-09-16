@@ -1,9 +1,13 @@
 from pathlib import Path
+from unittest.mock import MagicMock
 
 import numpy as np
 import pandas as pd
 import pytest
+import requests
+from astropy.table import Table
 
+import Binary_Pulsar_Distances.eliminating as eliminating_module
 from Binary_Pulsar_Distances.atnf import read_atnf_long_with_errors
 from Binary_Pulsar_Distances.eliminating import (
     add_dm_distance,
@@ -12,7 +16,9 @@ from Binary_Pulsar_Distances.eliminating import (
     filter_binary,
     filter_in_globular,
     filter_position_uncertainty,
+    get_matches,
     matching_pipeline,
+    psr_to_gaia,
 )
 
 FIXTURES = Path(__file__).resolve().parent / "Binary_Pulsar_Distances" / "text_files_test"
@@ -167,6 +173,93 @@ class TestAddDmDistance:
         result = add_dm_distance(matches)
 
         assert result["dm_distance_pc"].iloc[0] == pytest.approx(267.3, rel=0.2)
+
+
+class TestPsrToGaiaRetry:
+
+    def test_retries_on_transient_error_then_succeeds(self, monkeypatch):
+        """
+        psr_to_gaia() should retry a transient request failure (e.g. the live
+        HTTP 500 the Gaia archive returned during Phase 1 development) and
+        succeed once the underlying query stops failing.
+        """
+        call_count = {"n": 0}
+
+        def flaky_cone_search_async(coordinate, radius):
+            call_count["n"] += 1
+            if call_count["n"] < 3:
+                raise requests.exceptions.HTTPError("Error 500: null")
+            job = MagicMock()
+            job.get_results.return_value = Table({"source_id": [123]})
+            return job
+
+        monkeypatch.setattr(eliminating_module.Gaia, "cone_search_async", flaky_cone_search_async)
+        monkeypatch.setattr(eliminating_module.time, "sleep", lambda seconds: None)
+
+        result = psr_to_gaia("J0000+0000", 0.0, 0.0, 0.0, 0.0, 55000.0, max_retries=5)
+
+        assert call_count["n"] == 3
+        assert list(result["source_id"]) == [123]
+
+    def test_raises_after_exhausting_retries(self, monkeypatch):
+        def always_fails(coordinate, radius):
+            raise requests.exceptions.HTTPError("Error 500: null")
+
+        monkeypatch.setattr(eliminating_module.Gaia, "cone_search_async", always_fails)
+        monkeypatch.setattr(eliminating_module.time, "sleep", lambda seconds: None)
+
+        with pytest.raises(requests.exceptions.HTTPError):
+            psr_to_gaia("J0000+0000", 0.0, 0.0, 0.0, 0.0, 55000.0, max_retries=3)
+
+
+class TestGetMatchesCheckpointing:
+
+    def _pulsar_df(self):
+        return pd.DataFrame(
+            {
+                "jname": ["J0000+0000", "J0001+0000"],
+                "raj_deg": [0.0, 0.1],
+                "decj_deg": [0.0, 0.1],
+                "pmra_masyr": [0.0, 0.0],
+                "pmdec_masyr": [0.0, 0.0],
+                "posepoch_mjd": [55000.0, 55000.0],
+            }
+        )
+
+    def test_resumes_without_requerying_already_completed_pulsars(self, tmp_path, monkeypatch):
+        """
+        If get_matches() is interrupted partway through (here, simulated by
+        the second pulsar's query raising), a second call with the same
+        checkpoint_file should skip the pulsar already recorded as done and
+        only query the remaining one.
+        """
+        calls = []
+
+        def crash_on_second_pulsar(jname, *args, **kwargs):
+            calls.append(jname)
+            if jname == "J0001+0000":
+                raise requests.exceptions.HTTPError("boom")
+            return pd.DataFrame({"source_id": [1], "jname_echo": [jname]})
+
+        checkpoint_file = tmp_path / "checkpoint.csv"
+        monkeypatch.setattr(eliminating_module, "psr_to_gaia", crash_on_second_pulsar)
+
+        with pytest.raises(requests.exceptions.HTTPError):
+            get_matches(self._pulsar_df(), checkpoint_file=str(checkpoint_file), max_retries=1)
+
+        assert calls == ["J0000+0000", "J0001+0000"]
+
+        calls.clear()
+
+        def succeeds(jname, *args, **kwargs):
+            calls.append(jname)
+            return pd.DataFrame({"source_id": [1], "jname_echo": [jname]})
+
+        monkeypatch.setattr(eliminating_module, "psr_to_gaia", succeeds)
+        result = get_matches(self._pulsar_df(), checkpoint_file=str(checkpoint_file), max_retries=1)
+
+        assert calls == ["J0001+0000"]
+        assert sorted(result["jname_echo"]) == ["J0000+0000", "J0001+0000"]
 
 
 class TestMatchingPipeline:

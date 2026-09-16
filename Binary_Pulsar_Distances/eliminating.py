@@ -1,7 +1,9 @@
 import os
+import time
 
 import numpy as np
 import pandas as pd
+import requests
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 from astropy.time import Time
@@ -75,12 +77,26 @@ def filter_in_globular(df, gc_names=None):
     return df[~df["jname"].isin(gc_names)].reset_index(drop=True)
 
 
-def psr_to_gaia(jname, raj_deg, decj_deg, pmra_masyr, pmdec_masyr, posepoch_mjd, radius_arcsec=1.0):
+def psr_to_gaia(
+    jname,
+    raj_deg,
+    decj_deg,
+    pmra_masyr,
+    pmdec_masyr,
+    posepoch_mjd,
+    radius_arcsec=1.0,
+    max_retries=5,
+    backoff_base_seconds=5.0,
+):
     """Cone-searches Gaia DR3 for a possible companion to one pulsar.
 
     Propagates the pulsar's position from its ATNF timing epoch to the Gaia
     DR3 reference epoch (2016.0) using its proper motion, then searches for
     Gaia sources within ``radius_arcsec`` of that propagated position.
+
+    Transient failures (network errors, or an HTTP error from the Gaia
+    archive) are retried with exponential backoff, since a large batch of
+    queries is likely to hit at least one such failure.
 
     Args:
         jname (str): Name of the pulsar being checked for matches.
@@ -90,9 +106,15 @@ def psr_to_gaia(jname, raj_deg, decj_deg, pmra_masyr, pmdec_masyr, posepoch_mjd,
         pmdec_masyr (float): Proper motion in Dec, in mas/yr.
         posepoch_mjd (float): Epoch of ``raj_deg``/``decj_deg``, in MJD.
         radius_arcsec (float, optional): Radius of the Gaia cone search, in arcsec.
+        max_retries (int, optional): Number of attempts before giving up.
+        backoff_base_seconds (float, optional): Base delay for exponential
+            backoff between retries (doubles each attempt).
 
     Returns:
         pandas.DataFrame: Gaia DR3 sources found in the search (may be empty).
+
+    Raises:
+        requests.exceptions.RequestException: If every retry attempt fails.
     """
     gaia_epoch = Time("2016.0", format="jyear").jyear
     p_epoch = Time(posepoch_mjd, format="mjd").jyear
@@ -107,13 +129,24 @@ def psr_to_gaia(jname, raj_deg, decj_deg, pmra_masyr, pmdec_masyr, posepoch_mjd,
     Gaia.ROW_LIMIT = 2000
     Gaia.MAIN_GAIA_TABLE = "gaiadr3.gaia_source"
     coord = SkyCoord(ra=new_ra, dec=new_dec, frame="icrs")
-    job = Gaia.cone_search_async(coordinate=coord, radius=u.Quantity(radius_arcsec, u.arcsec))
-    results = job.get_results()
 
-    return results.to_pandas()
+    for attempt in range(max_retries):
+        try:
+            job = Gaia.cone_search_async(coordinate=coord, radius=u.Quantity(radius_arcsec, u.arcsec))
+            results = job.get_results()
+            return results.to_pandas()
+        except requests.exceptions.RequestException:
+            if attempt == max_retries - 1:
+                raise
+            wait_seconds = backoff_base_seconds * (2**attempt)
+            print(
+                f"Gaia query for {jname} failed (attempt {attempt + 1}/{max_retries}); "
+                f"retrying in {wait_seconds:.0f}s"
+            )
+            time.sleep(wait_seconds)
 
 
-def get_matches(df, radius_arcsec=1.0):
+def get_matches(df, radius_arcsec=1.0, max_retries=5, backoff_base_seconds=5.0, checkpoint_file=None):
     """Cross-matches each pulsar in ``df`` against Gaia DR3.
 
     Args:
@@ -121,33 +154,65 @@ def get_matches(df, radius_arcsec=1.0):
             (optionally filtered by :func:`filter_position_uncertainty`,
             :func:`filter_binary`, :func:`filter_in_globular`).
         radius_arcsec (float, optional): Radius of the Gaia cone search, in arcsec.
+        max_retries (int, optional): See :func:`psr_to_gaia`.
+        backoff_base_seconds (float, optional): See :func:`psr_to_gaia`.
+        checkpoint_file (str, optional): Path to a CSV to incrementally save
+            progress to after each pulsar. If it already exists (from a
+            previous, interrupted run), pulsars already recorded there are
+            skipped rather than re-queried, so an interrupted run can be
+            resumed by calling this again with the same path.
 
     Returns:
         pandas.DataFrame: One row per (pulsar, Gaia candidate) pair, with all
             of the pulsar's own columns carried through alongside Gaia's.
             Empty if no pulsar had any candidates.
     """
+    done_log = f"{checkpoint_file}.done" if checkpoint_file else None
+    processed = set()
     frames = []
+
+    if checkpoint_file is not None:
+        if os.path.exists(done_log):
+            with open(done_log) as f:
+                processed = {line.strip() for line in f if line.strip()}
+        if os.path.exists(checkpoint_file):
+            existing = pd.read_csv(checkpoint_file)
+            if len(existing) > 0:
+                frames.append(existing)
+
     for row in df.itertuples(index=False):
         pulsar_attrs = row._asdict()
+        jname = pulsar_attrs["jname"]
+        if jname in processed:
+            continue
+
         gaia_matches = psr_to_gaia(
-            pulsar_attrs["jname"],
+            jname,
             pulsar_attrs["raj_deg"],
             pulsar_attrs["decj_deg"],
             pulsar_attrs["pmra_masyr"],
             pulsar_attrs["pmdec_masyr"],
             pulsar_attrs["posepoch_mjd"],
             radius_arcsec=radius_arcsec,
+            max_retries=max_retries,
+            backoff_base_seconds=backoff_base_seconds,
         )
-        if len(gaia_matches) == 0:
-            continue
-        for key, value in pulsar_attrs.items():
-            gaia_matches[key] = value
-        frames.append(gaia_matches)
+
+        if len(gaia_matches) > 0:
+            for key, value in pulsar_attrs.items():
+                gaia_matches[key] = value
+            frames.append(gaia_matches)
+
+        processed.add(jname)
+        if checkpoint_file is not None:
+            combined = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+            combined.to_csv(checkpoint_file, index=False)
+            with open(done_log, "a") as f:
+                f.write(jname + "\n")
 
     if not frames:
         return pd.DataFrame()
-    return pd.concat(frames, ignore_index=True)
+    return pd.concat(frames, ignore_index=True).drop_duplicates()
 
 
 def confirm_proper_motion(matches_df, n_sigma=3.0):
@@ -303,6 +368,9 @@ def matching_pipeline(
     gc_names=None,
     include_dm_distance=True,
     pretty_print_output=False,
+    max_retries=5,
+    backoff_base_seconds=5.0,
+    checkpoint_file=None,
 ):
     """Runs the full ATNF-to-Gaia cross-match pipeline end to end.
 
@@ -322,6 +390,10 @@ def matching_pipeline(
             distance via :func:`add_dm_distance` (requires ``pygedm``).
         pretty_print_output (bool, optional): Whether to also write a
             human-readable ``output_file + '.txt'`` via :func:`pretty_print_matches`.
+        max_retries (int, optional): See :func:`get_matches`.
+        backoff_base_seconds (float, optional): See :func:`get_matches`.
+        checkpoint_file (str, optional): See :func:`get_matches` -- recommended
+            for any large run, so it can be resumed if interrupted.
 
     Returns:
         pandas.DataFrame: The final matches table (also written to ``output_file``).
@@ -331,7 +403,13 @@ def matching_pipeline(
     df = filter_binary(df)
     df = filter_in_globular(df, gc_names=gc_names)
 
-    matches = get_matches(df, radius_arcsec=radius_arcsec)
+    matches = get_matches(
+        df,
+        radius_arcsec=radius_arcsec,
+        max_retries=max_retries,
+        backoff_base_seconds=backoff_base_seconds,
+        checkpoint_file=checkpoint_file,
+    )
     if len(matches) > 0:
         matches = confirm_proper_motion(matches, n_sigma=n_sigma)
         matches = add_gaia_distance(matches)
