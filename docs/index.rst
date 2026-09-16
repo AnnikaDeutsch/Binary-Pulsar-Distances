@@ -9,7 +9,8 @@ Welcome to PSRmatch's documentation!
 .. toctree::
    :maxdepth: 4
    :caption: Contents:
-   
+
+   atnf.rst
    eliminating.rst
 
 
