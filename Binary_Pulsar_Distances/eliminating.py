@@ -1,456 +1,346 @@
-import astropy
-import astropy.units as u
-import astroquery
-from astroquery.gaia import Gaia
-from astropy.coordinates import SkyCoord
-from astropy.coordinates import Angle
-import numpy as np
-import matplotlib.pyplot as plt
-from astropy.visualization import quantity_support
-from astropy.time import Time 
 import os
-from astropy.io.votable import parse_single_table
-from astropy.time import Time
-import pytest
-from astropy.table import Table, vstack
-import csv
+
+import numpy as np
 import pandas as pd
+import astropy.units as u
+from astropy.coordinates import SkyCoord
+from astropy.time import Time
+from astroquery.gaia import Gaia
+
+from .atnf import read_atnf_long_with_errors
 
 
-def psr_to_gaia(jname, raj, decj,  pmra, pmdec, posepoch, radius):
-    """Searches Gaia for possible companion to any given pulsar
+def filter_position_uncertainty(df, max_arcsec=1.0):
+    """Keep only pulsars with a confidently known position.
 
-    Given input parameters read in from a text file following the guidelines of ATNF parameters, 
-    queries Gaia DR2 to find matches (nearby objects from Gaia) based on RA and Dec for each object 
-    from the text file to within a certain range, the default being 1 arcmin in both ra and dec.
+    Removes pulsars whose RA or Dec uncertainty is unmeasured (NaN) or
+    exceeds ``max_arcsec``, since these can't be confidently matched against
+    Gaia astrometry.
 
     Args:
-        jname (str): Name of the pulsar being checked for matches 
-        raj (str): Right ascension of the pulsar in hh:mm:ss.ss format -- is this actually what it is?
-        decj (str): Declination of the pulsar in degrees:mm:ss.ss format -- is this actually what it is?
-        pmra (str): Proper motion in ra of the pulsar in string format and mas/yr units
-        pmdec (str): proper motion in dec of the pulsar in string format and mas/yr units
-        posepoch (str): epoch that the data was taken in string format and mjd units
-        height (float): Height of Gaia box search in arcminutes
-        width (float): Width of Gaia box search in arcminutes 
-        radius (float): Radius of the Gaia cone search in arcminutes
-    
+        df (pandas.DataFrame): Pulsar table from :func:`read_atnf_long_with_errors`,
+            with ``raj_err_arcsec`` and ``decj_err_arcsec`` columns.
+        max_arcsec (float, optional): Maximum acceptable position uncertainty,
+            in arcsec, on each axis.
+
     Returns:
-        Table: results of the Gaia query in an astropy Table  
+        pandas.DataFrame: The rows that pass the cut.
     """
-
-    from astropy.time import Time 
-    p_ra = raj # comes in as a string of units hh:mm:ss.ss
-    p_dec = decj # comes in as a string of units dd:mm:ss.s
-    p_pmra = pmra # comes in as a string of units mas/yr
-    p_pmdec = pmdec # comes in as a string of units mas/yr
-    p_epoch = Time(posepoch, format='mjd').jyear # comes in in units mjd, is immediately converted to jyear tcb
-
-    p_ra_ang = Angle(p_ra + ' hours') # stores the ra in hms as an Angle object
-    p_dec_ang = Angle(p_dec + ' degrees') # stores the dec in dms as an Angle object
-
-    p_ra_deg = p_ra_ang.degree * u.deg # stores the ra converted to degrees 
-    p_dec_deg = p_dec_ang.degree * u.deg # stores the dec converted to degrees
-
-    # first create variables for the pm units as they come in from atnf, mas/yr
-    pmra_masyr = float(p_pmra) * u.mas / u.yr
-    pmdec_masyr = float(p_pmdec) * u.mas /u.yr
-
-    # then convert to variable that represent the pms in deg/yr
-    pmra_degyr = pmra_masyr.to(u.deg / u.yr)
-    pmdec_degyr = pmdec_masyr.to(u.deg / u.yr)
-
-    # to propogate location of pulsar up to gaia time, must calculate epoch difference
-    gaia_epoch = Time('2016.0', format='jyear').jyear
-    year_diff = (gaia_epoch.tolist() * u.yr) - (p_epoch.tolist() * u.yr) # difference b/w epochs in years
-
-    # get the new ra and dec for the pulsar by updating to gaia epoch 
-    p_new_ra = p_ra_deg + (pmra_degyr * year_diff) #   CHANGE BACK TO PMRA_DEGYR WHEN DONE
-    p_new_dec = p_dec_deg + (pmdec_degyr * year_diff)#   CHANGE BACK TO PMDEC_DEGYR WHEN DONE
-
-    print(p_new_ra)
-    print(p_new_dec)
-
-    # ra_ext_pos = raj + rajerr + (pmra + pmraerr)*year_diff
-    # ra_ext_neg = raj - rajerr + (pmra - pmraerr)*year_diff
-
-    # dec_ext_pos = decj + decjerr + (pmdec + pmdecerr)*year_diff
-    # dec_ext_neg = decj - decjerr + (pmdec - pmdecerr)*year_diff
+    mask = (
+        df["raj_err_arcsec"].notna()
+        & df["decj_err_arcsec"].notna()
+        & (df["raj_err_arcsec"] < max_arcsec)
+        & (df["decj_err_arcsec"] < max_arcsec)
+    )
+    return df[mask].reset_index(drop=True)
 
 
+def filter_binary(df):
+    """Keep only pulsars known to be in a binary.
 
-    # Query Gaia within the range of the given pulsar 
+    Args:
+        df (pandas.DataFrame): Pulsar table with a ``binary_type`` column,
+            where ATNF marks isolated pulsars with ``'*'``.
+
+    Returns:
+        pandas.DataFrame: The rows that pass the cut.
+    """
+    return df[df["binary_type"] != "*"].reset_index(drop=True)
+
+
+def _load_globular_cluster_names(gc_names_path=None):
+    if gc_names_path is None:
+        package_dir = os.path.dirname(os.path.abspath(__file__))
+        gc_names_path = os.path.join(package_dir, "gc_pulsar_names.csv")
+    with open(gc_names_path) as f:
+        return {line.split()[0] for line in f if line.strip()}
+
+
+def filter_in_globular(df, gc_names=None):
+    """Remove pulsars known to live in a globular cluster.
+
+    Globular clusters are crowded enough that a position/proper-motion
+    cross-match against Gaia can't be trusted there.
+
+    Args:
+        df (pandas.DataFrame): Pulsar table with a ``jname`` column.
+        gc_names (set, optional): Set of globular-cluster pulsar JNames to
+            exclude. Defaults to the bundled ``gc_pulsar_names.csv``.
+
+    Returns:
+        pandas.DataFrame: The rows that pass the cut.
+    """
+    if gc_names is None:
+        gc_names = _load_globular_cluster_names()
+    return df[~df["jname"].isin(gc_names)].reset_index(drop=True)
+
+
+def psr_to_gaia(jname, raj_deg, decj_deg, pmra_masyr, pmdec_masyr, posepoch_mjd, radius_arcsec=1.0):
+    """Cone-searches Gaia DR3 for a possible companion to one pulsar.
+
+    Propagates the pulsar's position from its ATNF timing epoch to the Gaia
+    DR3 reference epoch (2016.0) using its proper motion, then searches for
+    Gaia sources within ``radius_arcsec`` of that propagated position.
+
+    Args:
+        jname (str): Name of the pulsar being checked for matches.
+        raj_deg (float): Right ascension at ``posepoch_mjd``, in degrees.
+        decj_deg (float): Declination at ``posepoch_mjd``, in degrees.
+        pmra_masyr (float): Proper motion in RA, in mas/yr.
+        pmdec_masyr (float): Proper motion in Dec, in mas/yr.
+        posepoch_mjd (float): Epoch of ``raj_deg``/``decj_deg``, in MJD.
+        radius_arcsec (float, optional): Radius of the Gaia cone search, in arcsec.
+
+    Returns:
+        pandas.DataFrame: Gaia DR3 sources found in the search (may be empty).
+    """
+    gaia_epoch = Time("2016.0", format="jyear").jyear
+    p_epoch = Time(posepoch_mjd, format="mjd").jyear
+    year_diff = (gaia_epoch - p_epoch) * u.yr
+
+    pmra_degyr = (pmra_masyr * u.mas / u.yr).to(u.deg / u.yr)
+    pmdec_degyr = (pmdec_masyr * u.mas / u.yr).to(u.deg / u.yr)
+
+    new_ra = raj_deg * u.deg + pmra_degyr * year_diff
+    new_dec = decj_deg * u.deg + pmdec_degyr * year_diff
+
     Gaia.ROW_LIMIT = 2000
-    Gaia.MAIN_GAIA_TABLE = "gaiadr3.gaia_source" # Select early Data Release 3
-    coord=SkyCoord(ra=p_new_ra, dec=p_new_dec, unit=(u.degree, u.degree), frame='icrs')
-    radius = u.Quantity(radius, u.arcsec)
-    width_gaia = u.Quantity(1., u.arcmin) # by default, queries in 1 arcmin range
-    height_gaia = u.Quantity(1., u.arcmin) # by default, queries in 1 arcmin range
-    if jname == 'J0437-4715':
-        j = Gaia.cone_search_async(coordinate=coord, radius=u.Quantity(5., u.arcsec))
-    else:
-        j = Gaia.cone_search_async(coordinate=coord, radius=radius)
-    results = j.get_results()
+    Gaia.MAIN_GAIA_TABLE = "gaiadr3.gaia_source"
+    coord = SkyCoord(ra=new_ra, dec=new_dec, frame="icrs")
+    job = Gaia.cone_search_async(coordinate=coord, radius=u.Quantity(radius_arcsec, u.arcsec))
+    results = job.get_results()
 
-    # use python sort function
-    
-    if len(results) == 0:
-        return results
-    else:
-        results.add_column(jname, name='Companion Pulsar', index=0)
-        return results
+    return results.to_pandas()
 
 
-def get_matches(input_file, output_file, radius=1.):
-    """Takes a list of pulsars and returns a list of those with potential matches.
-
-    Takes as input a text file (.csv file) with index number, name, ra, dec, proper
-    motion ra, proper motion dec and posepoch of a list of pulsars and produces all of the gaia 
-    matches of ra and dec to within a certain range.
-
-    Args: 
-        input_file (str): Name of the text file (csv) containing each pulsar with the parameters 'index', 'jname', 
-            'ra', 'dec', 'pmra', 'pmdec', 'posepoch' row by row for each object.
-        output_file (str): Name of the text file which the pulsar-gaia matches will be output to. If desired,
-            specify the full path to which the file should be saved, otherwise it will just be saved to the 
-            present working directory
-        height (:obj:'float', optional): Height of the rectangle Gaia will query in.
-        width (:obj:'float', optional): Width of the rectangle Gaia will query in.
-        radius (:obj:'float', optional): Radius of the circle Gaia will query in. 
-
-
-    """
-    from astropy.table import Table, vstack
-
-    f = open(input_file, "r")
-    results = Table()
-    first_time = True
-    skipped = 0
-
-    # Loop through file of ATNF data and combine tables of Gaia matches into one supertable
-    for line in f:
-
-      # Parse input
-      values = line.split(';')
-
-      if values[2] == '*' or values[3] == '*' or values[4] == '*' or values[5] == '*' or values[6] == '*':
-        skipped += 1
-        continue
-
-      # Add result to supertable
-      search_result = psr_to_gaia(values[1],values[2],values[3],values[4],values[5],values[6],radius)
-      if (len(search_result) == 0):
-        continue
-      if first_time:
-        results = search_result
-        first_time = False
-      else:  
-        results = vstack([results, search_result])
-
-    results.write(output_file, format='csv', overwrite=True)
-    return skipped
-
-
-def check_binary(input_file, output_file):
-    """Removes isolated pulsars from input file.
-
-    Given an input file, checks that each pulsar in the file is in a known binary, and 
-    removes those that are not. Checks the 'type' parameter for each entry, and removes 
-    those objects with an asterisk as the value in that field.
+def get_matches(df, radius_arcsec=1.0):
+    """Cross-matches each pulsar in ``df`` against Gaia DR3.
 
     Args:
-        input_file (str): Name of the text file (csv) containing each pulsar, with the 
-            parameters 'index', 'jname', 'ra', 'dec', 'pmra', 'pmdec', 'posepoch' and 
-            'binary' as listed in the ATNF catalouge.
-        output_file (str): Name of the new text file (csv) created with only the binary 
-            pulsars.
-    
+        df (pandas.DataFrame): Pulsar table from :func:`read_atnf_long_with_errors`
+            (optionally filtered by :func:`filter_position_uncertainty`,
+            :func:`filter_binary`, :func:`filter_in_globular`).
+        radius_arcsec (float, optional): Radius of the Gaia cone search, in arcsec.
 
+    Returns:
+        pandas.DataFrame: One row per (pulsar, Gaia candidate) pair, with all
+            of the pulsar's own columns carried through alongside Gaia's.
+            Empty if no pulsar had any candidates.
     """
+    frames = []
+    for row in df.itertuples(index=False):
+        pulsar_attrs = row._asdict()
+        gaia_matches = psr_to_gaia(
+            pulsar_attrs["jname"],
+            pulsar_attrs["raj_deg"],
+            pulsar_attrs["decj_deg"],
+            pulsar_attrs["pmra_masyr"],
+            pulsar_attrs["pmdec_masyr"],
+            pulsar_attrs["posepoch_mjd"],
+            radius_arcsec=radius_arcsec,
+        )
+        if len(gaia_matches) == 0:
+            continue
+        for key, value in pulsar_attrs.items():
+            gaia_matches[key] = value
+        frames.append(gaia_matches)
 
-    from astropy.table import Table, vstack
-    import csv
-
-    f = open(input_file, 'r')
-    first_time = True
-    new = []
-    count = 1
-    for line in f:
-        values = line.split(';')
-        while len(values) - 1 > 11:
-            values.pop()
-        if values[11] != "*":
-            values[0] = count
-            values[11] = values[11].replace('\n',';')
-            if first_time:
-                new.insert(0, values)
-                first_time = False
-            else:
-                new.append(values)
-            count += 1
-
-# == 'MS' or values[7] == 'NS' or values[7] == 'CO' or values[7] == 'He' or values[7] == 'UL' or values[7] == 'ELL1'
-    
-    with open(output_file, 'w') as g:
-        write = csv.writer(g, delimiter=';')
-        write.writerows(new)
+    if not frames:
+        return pd.DataFrame()
+    return pd.concat(frames, ignore_index=True)
 
 
-def check_pos_uncertainty(input_file, output_file):
-    """Removes pulsars with position uncertainty > 1".
+def confirm_proper_motion(matches_df, n_sigma=3.0):
+    """Flags Gaia candidates whose proper motion agrees with the pulsar's.
 
-    Given an input file, checks the uncertainty in ra and dec of each pulsar, and removes 
-    any object that has an uncertainty greater than >1", to exclude pulsars that cannot
-    be confidently matched against Gaia astrometry. The input file MUST be of the ATNF 
-    output style "long with errors", and then copied directly into a csv for the function 
-    to work correctly.
+    Position alone doesn't confirm a physical association -- a true binary
+    companion should also share the pulsar's proper motion. This compares
+    each candidate's Gaia proper motion against the pulsar's ATNF timing
+    proper motion, combining their uncertainties in quadrature.
 
     Args:
-        input_file (str): Name of the text file (csv) containing each pulsar, with the 
-            parameters 'index', 'jname', 'ra', 'dec', 'pmra', 'pmdec', 'posepoch', 'DM', and 
-            'binary' as listed in the ATNF catalouge.
-        output_file (str): Name of the new text file (csv) created with only the binary 
-            pulsars.
-    
+        matches_df (pandas.DataFrame): Output of :func:`get_matches`.
+        n_sigma (float, optional): Maximum allowed combined-uncertainty
+            significance, on each axis, to count as agreement.
+
+    Returns:
+        pandas.DataFrame: ``matches_df`` with added ``pm_sigma_ra``,
+            ``pm_sigma_dec``, and boolean ``pm_match`` columns.
     """
+    df = matches_df.copy()
 
-    import csv
+    sigma_ra = np.sqrt(df["pmra_error"] ** 2 + df["pmra_err_masyr"] ** 2)
+    sigma_dec = np.sqrt(df["pmdec_error"] ** 2 + df["pmdec_err_masyr"] ** 2)
 
-    f = open(input_file, 'r')
-    first_time = True
-    new = []
-    count = 1
-    index = 0
-    for line in f:
-        # if (index) % 5 == 0:
-        #     continue
-        if (index%5) != 0 or index == 0:
-            values = line.split()
-            # print(values)
-            # while len(values) - 1 > 7:
-            #     values.pop()
-            if values[4] != '0':
-                ra_err = values[4].split('e')
-            else:
-                ra_err = [0,-1]
-            if values[7] != '0':
-                dec_err = values[7].split('e')
-            else:
-                ra_err = [0,-1]
-            if int(ra_err[1]) < 0:
-                if int(dec_err[1]) < 0:
-                    values.pop(21)
-                    values.pop(19)
-                    values.pop(16)
-                    values.pop(14)
-                    values.pop(11)
-                    values.pop(8)
-                    values.pop(7)
-                    values.pop(5)
-                    values.pop(4)
-                    values.pop(2)
-                    values[0] = count 
-                    # values[9] = values[9].replace('\n',';')
-                    values.append('')
-                    if first_time:
-                        new.insert(0, values)
-                        first_time = False
-                    else:
-                        new.append(values)
-                    count += 1
-            index += 1
-        else:
-            index = 0
-    
-
-    
-    with open(output_file, 'w') as g:
-        write = csv.writer(g, delimiter=';')
-        write.writerows(new)
+    df["pm_sigma_ra"] = np.abs(df["pmra"] - df["pmra_masyr"]) / sigma_ra
+    df["pm_sigma_dec"] = np.abs(df["pmdec"] - df["pmdec_masyr"]) / sigma_dec
+    df["pm_match"] = (df["pm_sigma_ra"] < n_sigma) & (df["pm_sigma_dec"] < n_sigma)
+    return df
 
 
-def check_in_globular(input_file, output_file):
-    """Removes pulsars in globular clusters.
+def add_gaia_distance(matches_df):
+    """Adds a Gaia-based distance estimate to each match.
 
-    Given an input file, checks the pulsar names against a list of pulsars in globular clusters, stored in 
-    a file called 'gc_pulsar_names.csv', and removes those that match with any of the names in the list. Make
-    sure the file 'gc_pulsar_names.csv' from the GitHub repo is in the directory in which you are running
-    this function!
+    Prefers Gaia DR3's own ``distance_gspphot`` (a photometric+parallax
+    distance with a proper Galactic prior) where available, falling back to
+    a naive inverse-parallax distance otherwise.
 
     Args:
-        input_file (str): Name of the text file (csv) containing each pulsar on a separate line, with the 
-            parameters 'index', 'jname', 'ra', 'dec', 'pmra', 'pmdec', 'posepoch', 'binary' as listed in ATNF
-        output_file (str): Name of the new text file (csv) created with only pulsars not in globular 
-            clusters.
-    
+        matches_df (pandas.DataFrame): Output of :func:`get_matches` (or
+            :func:`confirm_proper_motion`), with Gaia's ``parallax``,
+            ``parallax_error``, and (if present) ``distance_gspphot``,
+            ``distance_gspphot_lower``, ``distance_gspphot_upper`` columns.
+
+    Returns:
+        pandas.DataFrame: ``matches_df`` with added ``gaia_distance_pc``,
+            ``gaia_distance_lower_pc``, ``gaia_distance_upper_pc``, and
+            ``distance_method`` (``"gspphot"`` or ``"parallax_inverse"``) columns.
     """
-    import csv
+    df = matches_df.copy()
+    n = len(df)
 
-    package_dir = os.path.dirname(os.path.abspath(__file__))
-    gc_names_path = os.path.join(package_dir, 'gc_pulsar_names.csv')
-    with open(gc_names_path, 'r') as g:
-        gc_names = {line.split()[0] for line in g if line.strip()}
+    def _column_or_nan(name):
+        return df[name] if name in df.columns else pd.Series([np.nan] * n, index=df.index)
 
-    f = open(input_file, 'r')
-    first_time = True
-    new = []
-    count = 1
-    for line in f:
-        values = line.rstrip('\n').split(';')
-        while len(values) - 1 > 9:
-            values.pop()
-        not_match = values[1] not in gc_names
-        if not_match:
-            values[0] = count
-            if first_time:
-                new.insert(0,values)
-                first_time = False
-            else:
-                new.append(values)
-            count += 1
-    with open(output_file, 'w') as h:
-        write = csv.writer(h, delimiter=';')
-        write.writerows(new)
+    gspphot = _column_or_nan("distance_gspphot")
+    gspphot_lower = _column_or_nan("distance_gspphot_lower")
+    gspphot_upper = _column_or_nan("distance_gspphot_upper")
+
+    fallback_dist = 1000.0 / df["parallax"]
+    fallback_err = np.abs(fallback_dist * df["parallax_error"] / df["parallax"])
+
+    use_gspphot = gspphot.notna()
+    df["gaia_distance_pc"] = np.where(use_gspphot, gspphot, fallback_dist)
+    df["gaia_distance_lower_pc"] = np.where(use_gspphot, gspphot_lower, fallback_dist - fallback_err)
+    df["gaia_distance_upper_pc"] = np.where(use_gspphot, gspphot_upper, fallback_dist + fallback_err)
+    df["distance_method"] = np.where(use_gspphot, "gspphot", "parallax_inverse")
+    return df
 
 
+def add_dm_distance(matches_df, method="ymw16"):
+    """Adds a dispersion-measure-based distance estimate to each match.
 
-def pretty_print(pulsar, source_id, filename, no_glob):
-    """Prints attributes of the pulsar/match pair in a readable format.
+    Converts each pulsar's DM to a distance using a Galactic free-electron-
+    density model, for comparison against the Gaia-based distance.
+
+    Requires the optional ``pygedm`` dependency; install it separately
+    (``pip install pygedm``) if this raises ``ImportError``.
 
     Args:
-        pulsar (str): JName of the pulsar as it is in the list of matched files from matching_pipeline().
-        source_id (str): Source ID of the Gaia match as given from matching_pipeline().
-        filename (str): Name of the (txt) file to which the results will be output.
-        no_glob (str): name of the file from the matching pipeline that contains all the pulsars from 
-            after the step of removing pulsars in globular clusters. 
-    
+        matches_df (pandas.DataFrame): Output of :func:`get_matches`, with
+            ``gl_deg``, ``gb_deg``, and ``dm`` columns.
+        method (str, optional): Electron-density model to use (``"ymw16"``
+            or ``"ne2001"``).
+
+    Returns:
+        pandas.DataFrame: ``matches_df`` with an added ``dm_distance_pc`` column.
     """
+    import pygedm
 
-    # query gaia for one of the matches, and only retrieve the parameters we care about, in this case parallax
-    # pm, and g-band magnitude
-    job = Gaia.launch_job("select top 20 "
-                          "gaia_source.source_id, gaia_source.parallax, gaia_source.parallax_error,"
-                          " gaia_source.pmra, gaia_source.pmdec, gaia_source.phot_g_mean_mag "
-                          "from gaiadr3.gaia_source "
-                          "where (gaiadr3.gaia_source.source_id=" + source_id + ")")
-    print(source_id)
-    # store the results of the query in an astropy table
-    gaia_results = job.get_results()
-    print(gaia_results)
-
-    # query atnf for the attributes we want of the pulsars 
-    l = open(no_glob, 'r')
-    for line in l:
-        values = line.split(';')
-        if values[1] == pulsar:
-                dm = values[9]
-                pmra = values[4]
-                pmra_err = values[5]
-                pmdec = values[6]
-                pmdec_err = values[9]
-
-    # create a txt file to store the data in a nice format
-    g = open(filename+'.txt', 'a')
-    g.write('PSR JNAME: ' + pulsar + '\n')
-    g.write('\n----Gaia Match Attributes----\n')
-    g.write('Gaia Source ID: ' + str(gaia_results[0][0]) + '\n')
-    g.write('Gaia PMRA: ' + str(gaia_results[0][3]) + ' mas/yr\n')
-    g.write('Gaia PMDEC: ' + str(gaia_results[0][4]) + ' mas/yr\n')
-    g.write('Gaia Parallax: ' + str(gaia_results[0][1]) + ' \u00B1 ' + str(gaia_results[0][2]) + ' mas')
-    g.write('\nGaia G-band-mag: ' + str(gaia_results[0][5]) + '\n')
-    g.write('\n----Pulsar Attributes----\n')
-    g.write('ATNF DM: ' + dm + 'pc / cm^{3}\n')
-    g.write('ATNF PMRA: ' + pmra + ' \u00B1 ' + pmra_err + ' mas/yr\n')
-    g.write('ATNF PMDEC: ' + pmdec + ' \u00B1 ' + pmdec_err + 
-            ' mas/yr\n')
-    g.write('\n')
-    g.write('-------------------------------------------------------------')
-    g.write('\n')
-    g.close()
+    df = matches_df.copy()
+    distances = []
+    for gl, gb, dm in zip(df["gl_deg"], df["gb_deg"], df["dm"]):
+        if np.isnan(dm):
+            distances.append(np.nan)
+            continue
+        dist, _ = pygedm.dm_to_dist(gl * u.deg, gb * u.deg, dm, method=method)
+        distances.append(dist.to(u.pc).value)
+    df["dm_distance_pc"] = distances
+    return df
 
 
-
-def matching_pipeline(input_file, output_file, no_pos, no_bin, no_glob, match_all_params, radius=1., 
-                      pretty_print= False):
-    """Carries out the identification of sources from a list of pulsars to a list potential Gaia matches.
-
-    Takes as input a text file of the ATNF format "long with errors", and runs through each step of the source
-    identification to produce a list of potential Gaia matches and some or all of their associated Gaia 
-    parameters. Pretty print allows the output to be printed in a slightly (only slightly) more readable 
-    and user-friendly format. 
+def pretty_print(match_row, filename):
+    """Appends a human-readable summary of one pulsar/Gaia match to a file.
 
     Args:
-        input_file (str): Path to the text file with the original list of pulsars with the paramters 
-            'index', 'jname', 'ra', 'dec', 'pmra', 'pmdec', 'posepoch', 'DM', and 
-            'binary' as listed in the ATNF catalouge.
-        output_file (str): Path to the final text file (csv) with the list of potential Gaia matches and 
-            a smaller amount of their associated parameters.
-        no_pos (str): Path to the intermediate file containing only pulsars with position uncertainties 
-            <1" as it comes out after being run through check_pos_uncertainty().
-        no_bin (str): Path to the intermediate file containing only pulsars in binaries
-            as it comes out after being run through check_binary().
-        no_glob (str): Path to the intermediate file containing only pulsars not in globular clusters
-            as it comes out after being run through check_in_globular().
-        match_all_params (str): Path to the intermediate file containing the list of all potential 
-            Gaia matches and all of their associated parameters.
-        radius (:obj:'float', optional): Radius of the circle Gaia will query in. 
-        pretty_print (:obj:'bool', optional): Will print an additional file of the list in a more user-
-            friendly format if set to True.
-    
+        match_row (pandas.Series): One row from a matches DataFrame that has
+            been through :func:`confirm_proper_motion` and
+            :func:`add_gaia_distance` (and, optionally, :func:`add_dm_distance`).
+        filename (str): Base name of the text file to append to (``.txt`` is added).
     """
-    check_pos_uncertainty(input_file, no_pos)
-    check_binary(no_pos, no_bin)
-    check_in_globular(no_bin, no_glob)
-    get_matches(no_glob, match_all_params, radius= radius)
-
-    # script to create an updated version of all_final.csv with only the parameters we wanna look at
-
-    c = open(match_all_params, 'r')
-    new = []
-    first_time = True
-    for line in c:
-        values = line.split(',')
-        values.pop(95)
-        count = 0 
-        while count < 40:
-            values.pop(91-count)
-            count += 1
-        index = 0
-        while index < 30:
-            values.pop(50-index)
-            index += 1
-        values.pop(12)
-        values.pop(5)
-        values.pop(4)
-        values.pop(2)
-        values.pop(1)
-        values.pop()
-        if first_time:
-            new.insert(0,values)
-            first_time = False
-        else:
-            new.append(values)
-    print(new)
-    import csv
-    with open(output_file, 'w') as h:
-        write = csv.writer(h, delimiter=';')
-        write.writerows(new)
-
-    if pretty_print:
-        f = open(match_all_params, 'w')
-        first_time = True
-        filename = output_file + 'prettyprinted'
-        no_glob = '/home/annika_deutsch/Binary-Pulsar-Distances/text_files_test/matching_pipeline_test/t1_noglob.csv'
-        for line in f:
-            values = line.split(';')
-            if first_time:
-                first_time = False
-                continue
-            else:
-                pretty_print(values[0], values[1], filename, no_glob)
+    with open(filename + ".txt", "a") as g:
+        g.write(f"PSR JNAME: {match_row['jname']}\n")
+        g.write("\n----Gaia Match Attributes----\n")
+        g.write(f"Gaia Source ID: {match_row['source_id']}\n")
+        g.write(f"Gaia PMRA: {match_row['pmra']} ± {match_row['pmra_error']} mas/yr\n")
+        g.write(f"Gaia PMDEC: {match_row['pmdec']} ± {match_row['pmdec_error']} mas/yr\n")
+        g.write(f"Gaia Parallax: {match_row['parallax']} ± {match_row['parallax_error']} mas\n")
+        g.write(f"Gaia G-band mag: {match_row['phot_g_mean_mag']}\n")
+        g.write(
+            f"Gaia distance ({match_row['distance_method']}): {match_row['gaia_distance_pc']:.1f} pc "
+            f"[{match_row['gaia_distance_lower_pc']:.1f}, {match_row['gaia_distance_upper_pc']:.1f}]\n"
+        )
+        g.write("\n----Pulsar Attributes----\n")
+        g.write(f"ATNF DM: {match_row['dm']} pc/cm^3\n")
+        if "dm_distance_pc" in match_row:
+            g.write(f"ATNF DM distance: {match_row['dm_distance_pc']:.1f} pc\n")
+        g.write(f"ATNF PMRA: {match_row['pmra_masyr']} ± {match_row['pmra_err_masyr']} mas/yr\n")
+        g.write(f"ATNF PMDEC: {match_row['pmdec_masyr']} ± {match_row['pmdec_err_masyr']} mas/yr\n")
+        g.write(
+            f"Proper motion agreement: {'YES' if match_row['pm_match'] else 'no'} "
+            f"(sigma_ra={match_row['pm_sigma_ra']:.1f}, sigma_dec={match_row['pm_sigma_dec']:.1f})\n"
+        )
+        g.write("\n-------------------------------------------------------------\n")
 
 
+def pretty_print_matches(matches_df, filename):
+    """Appends a human-readable summary of every row in ``matches_df``.
+
+    Args:
+        matches_df (pandas.DataFrame): See :func:`pretty_print`.
+        filename (str): Base name of the text file to append to (``.txt`` is added).
+    """
+    for _, row in matches_df.iterrows():
+        pretty_print(row, filename)
 
 
+def matching_pipeline(
+    input_file,
+    output_file,
+    max_pos_err_arcsec=1.0,
+    radius_arcsec=1.0,
+    n_sigma=3.0,
+    gc_names=None,
+    include_dm_distance=True,
+    pretty_print_output=False,
+):
+    """Runs the full ATNF-to-Gaia cross-match pipeline end to end.
 
+    Reads an ATNF "long with errors" export, filters to pulsars with a
+    confident position that are in a binary and not in a globular cluster,
+    cross-matches the survivors against Gaia DR3, confirms candidates by
+    proper-motion agreement, and adds Gaia- and DM-based distance estimates.
 
+    Args:
+        input_file (str): Path to the ATNF "long with errors" text export.
+        output_file (str): Path to write the final matches CSV to.
+        max_pos_err_arcsec (float, optional): See :func:`filter_position_uncertainty`.
+        radius_arcsec (float, optional): See :func:`get_matches`.
+        n_sigma (float, optional): See :func:`confirm_proper_motion`.
+        gc_names (set, optional): See :func:`filter_in_globular`.
+        include_dm_distance (bool, optional): Whether to add a DM-based
+            distance via :func:`add_dm_distance` (requires ``pygedm``).
+        pretty_print_output (bool, optional): Whether to also write a
+            human-readable ``output_file + '.txt'`` via :func:`pretty_print_matches`.
+
+    Returns:
+        pandas.DataFrame: The final matches table (also written to ``output_file``).
+    """
+    df = read_atnf_long_with_errors(input_file)
+    df = filter_position_uncertainty(df, max_arcsec=max_pos_err_arcsec)
+    df = filter_binary(df)
+    df = filter_in_globular(df, gc_names=gc_names)
+
+    matches = get_matches(df, radius_arcsec=radius_arcsec)
+    if len(matches) > 0:
+        matches = confirm_proper_motion(matches, n_sigma=n_sigma)
+        matches = add_gaia_distance(matches)
+        if include_dm_distance:
+            matches = add_dm_distance(matches)
+
+    matches.to_csv(output_file, index=False)
+
+    if pretty_print_output and len(matches) > 0:
+        pretty_print_matches(matches, output_file)
+
+    return matches
