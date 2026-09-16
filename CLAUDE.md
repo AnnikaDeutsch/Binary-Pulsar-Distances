@@ -67,21 +67,53 @@ being resumed with two goals, in order:
   documented justification — inconsistent with the "generalizable" goal, and
   callers can already pass their own `radius_arcsec`.
 - `pygedm` **is verified working**, in a dedicated conda env named `pygedm`
-  (`/opt/anaconda3/envs/pygedm`) — it still fails to compile from scratch in
-  whatever environment is doing day-to-day work here (broken/too-new macOS
-  SDK, `MacOSX27.0.sdk`), so this separate env is the way to actually run
-  `add_dm_distance()`/anything depending on `pygedm` until that's resolved.
-  Getting it working in that env took two extra fixes beyond `pip install
-  pygedm`, both already applied there: `pip install "setuptools<81"` (newer
-  setuptools dropped `pkg_resources`, which `pygedm` still imports) and
-  `pip install "scipy<1.14"` (newer scipy renamed `integrate.simps` to
-  `integrate.simpson`, and `pygedm`'s bundled YMW16 wrapper still calls the
-  old name). Confirmed `pygedm.dm_to_dist(gl, gb, dm, method='ymw16')` matches
-  my assumed API exactly, and `add_dm_distance()` reproduces the published
-  VLBI distance to PSR J2222-0137 (267.3 pc, Guo et al. 2021) to within 0.1 pc
-  using its real ATNF DM. To run anything needing `pygedm`:
-  `/opt/anaconda3/envs/pygedm/bin/python -m pytest eliminating_test.py`
-  (that env also has the rest of `requirements.txt` installed).
+  (`/opt/anaconda3/envs/pygedm`, currently Python 3.10). Run anything needing
+  `pygedm` with `/opt/anaconda3/envs/pygedm/bin/python -m pytest
+  eliminating_test.py` (that env also has the rest of `requirements.txt`).
+  **This took real effort to get working and is fragile — read this before
+  touching that env again:**
+  - The root problem is that **this machine's Xcode Command Line Tools
+    currently point at a broken/malformed SDK** (`MacOSX27.0.sdk`, referenced
+    under `/Library/Developer/CommandLineTools/SDKs/`), which breaks *any*
+    fresh compile of `pygedm`'s C/C++ extensions (YMW16, NE2001), regardless
+    of Python version — confirmed by watching a from-source build fail
+    identically on both Python 3.14 and a freshly recreated Python 3.10 env.
+    This is **not** a pygedm-version or Python-version issue; earlier
+    guessing that "just use Python 3.10" would fix it was wrong. The only
+    reason anything works at all is that pip has a **locally cached
+    prebuilt wheel** from an earlier successful compile (in
+    `~/Library/Caches/pip/wheels/...pygedm-3.3.0-cp310-cp310-macosx_11_0_arm64.whl`
+    — this cache is keyed to Python 3.10 specifically and is **user-level,
+    not tied to any one conda env**, so it survives `conda env remove`).
+    Until the system SDK is fixed, **don't run `pip install --no-binary
+    pygedm` or otherwise force a rebuild** — it will fail. Stick to Python
+    3.10 in this env so pip keeps reusing that cached wheel.
+  - Fresh `setuptools` (>=81) drops `pkg_resources`, which `pygedm/__init__.py`
+    still imports → `pip install "setuptools<81"` in that env.
+  - Fresh `scipy` (>=1.14) renamed `integrate.simps` to `integrate.simpson`,
+    and `pygedm`'s YMW16 wrapper still calls the old name → `pip install
+    "scipy<1.14"` in that env.
+  - The cached wheel's NE2001 extension (`ne21c`) links against
+    `libf2c.dylib`, which isn't available anywhere on this machine (not in
+    conda-forge or Homebrew) — **patched around it** by editing the
+    installed `.../site-packages/pygedm/pygedm.py` to wrap `from . import
+    ne2001_wrapper` in a `try/except ImportError` (falls back to `None`).
+    We only ever use `method='ymw16'`, so this is fine; calling
+    `dm_to_dist(..., method='ne2001')` in that env will now fail instead
+    (not something we do). **This is a hand-patch to installed
+    site-packages, not tracked by git or pip — it will be silently lost if
+    `pygedm` is ever reinstalled/upgraded in that env**, and would need to
+    be reapplied (same edit) if that happens.
+  - Confirmed `pygedm.dm_to_dist(gl, gb, dm, method='ymw16')` matches my
+    assumed API exactly, and `add_dm_distance()` reproduces the published
+    VLBI distance to PSR J2222-0137 (267.3 pc, Guo et al. 2021) to within
+    0.1 pc using its real ATNF DM — verified twice, independently, across
+    the original and recreated envs.
+  - The real, permanent fix would be repairing this machine's Xcode Command
+    Line Tools/SDK (out of scope to do unilaterally — it's a system-wide
+    change, not project-scoped); until then, treat the `pygedm` env as a
+    fragile, hand-assembled artifact rather than something safely
+    reproducible by just re-running `pip install -r requirements.txt`.
 - Earlier prototypes/duplicates of the position-match idea (`match_gaia_to_psr.py`
   + notebook, `oldquery.ipynb`, `query.ipynb`, and the old `matching_test.py`
   suite that tested them) live in `legacy/` — see `legacy/README.md`. The
@@ -111,6 +143,9 @@ being resumed with two goals, in order:
   `add_dm_distance()` against the published VLBI distance for the same
   pulsar; it `pytest.importorskip("pygedm")`s, so it's skipped wherever
   `pygedm` isn't installed and runs for real in the `pygedm` conda env.
+  `TestPsrToGaiaRetry` and `TestGetMatchesCheckpointing` cover the new
+  retry/checkpoint behavior via `monkeypatch` (no real network flakiness or
+  interrupted runs needed to test it).
 - `docs/` builds cleanly with Sphinx (`cd docs && make html`); added
   `docs/atnf.rst` alongside `docs/eliminating.rst`, both wired into
   `docs/index.rst`'s toctree.
@@ -119,6 +154,39 @@ being resumed with two goals, in order:
   `filter_binary`, `filter_in_globular`, `get_matches`,
   `confirm_proper_motion`, `add_gaia_distance`, `add_dm_distance`,
   `matching_pipeline`, `pretty_print`, `pretty_print_matches`, `psr_to_gaia`).
+- **Runtime cost of a full run, measured empirically (not estimated):** a
+  live Gaia `cone_search_async` query averages **~21.5s** per pulsar (timed
+  over 6 real queries; one of the 8 attempted hit a live `HTTP 500` from the
+  Gaia archive). Running the real filter chain against `all_atnf.csv`
+  (3320 valid rows) leaves **255 pulsars** to actually query (1844 pass
+  position, 292 of those are binaries, 255 of those aren't in a globular
+  cluster) — so a full run is roughly 255 × ~21.5s ≈ **~90 minutes**, serial,
+  scaling with the *filtered ATNF pulsar count*, not with Gaia DR3's size
+  (each query is a cheap indexed positional lookup against Gaia's archive,
+  regardless of its ~1.8 billion sources).
+- `psr_to_gaia()`/`get_matches()` now have **retry-with-exponential-backoff**
+  (`max_retries`, `backoff_base_seconds`, catching
+  `requests.exceptions.RequestException`) and `get_matches()` supports a
+  `checkpoint_file` that incrementally saves progress and a `.done` sibling
+  log of completed JNames, so an interrupted run (e.g. a persistent Gaia
+  outage after retries are exhausted) can be resumed by calling it again
+  with the same `checkpoint_file` path rather than restarting from scratch.
+  `matching_pipeline()` passes all three through.
+- **Investigated whether a single batched query (upload the whole pulsar
+  list to Gaia's TAP+ service, one ADQL join against `gaiadr3.gaia_source`)
+  would be faster than one query per pulsar — empirically, it was not.**
+  Tested with the same 8 pulsars used for the per-query timing above: the
+  batch upload-crossmatch job took **862.9 seconds** (~14 minutes) for all
+  8, versus ~172s doing them one at a time. The fixed per-query overhead
+  clearly isn't what dominates; the join itself seems to be the expensive
+  part on Gaia's end (possibly costed as a full join with no index pushed
+  down onto the uploaded table, or a lower-priority job queue for
+  user-table-upload jobs — not confirmed which). **Don't switch to a batch
+  upload-based approach without re-testing** — this could change if
+  Gaia's archive/query planner behaves differently at a larger n, but there's
+  no evidence for that yet, so per-pulsar querying (now with retry/checkpoint)
+  remains the recommended approach. The CDS X-Match service
+  (`astroquery.xmatch`) was considered but not tested as an alternative.
 
 ## Known open issues
 
