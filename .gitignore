@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# matching_pipeline() run outputs (results CSVs, checkpoints, logs)
+full_crossmatch_*
