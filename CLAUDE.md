@@ -28,8 +28,11 @@ being resumed with two goals, in order:
 1. **Finish the original pipeline** (done — see below): add the
    proper-motion-agreement confirmation step, then use confirmed matches to
    actually produce improved distance estimates. Producing and writing up
-   results across a full pulsar sample (the `galactic_projections.ipynb`
-   plotting work is a first step in this direction) is still in progress.
+   results across a full pulsar sample is underway: a first full run has
+   been done and `galactic_projections.ipynb` now plots its real output
+   (see below) — next would be a broader/repeat run and deeper interpretation
+   of the results (e.g. digging into why `J0337+1715`'s `gspphot` distance
+   looks unreliable) rather than more pipeline plumbing.
 2. **Generalize the framework**: rather than being hardcoded to ATNF + Gaia,
    support cross-matching *any* pulsar catalogue (adding the **MeerKAT
    Thousand Pulsar Array**) against *any* optical survey (adding
@@ -147,10 +150,33 @@ being resumed with two goals, in order:
 - `Binary_Pulsar_Distances/gc_names.py` + `gc_pulsars.csv` +
   `gc_pulsar_names.csv` build the globular-cluster exclusion list used by
   `filter_in_globular`.
-- `galactic_projections.ipynb` (+ `temp.csv`/`tempdr3.csv`) predates the
-  Phase 1 rearchitecture and plots the *old* pipeline's DR2/DR3 match output
-  format — it will need updating once we produce results from the new
-  pipeline (Phase 1's "produce and write up results" item, still open).
+- `galactic_projections.ipynb` was rewritten to plot the new pipeline's real
+  output (`full_crossmatch_results.csv`, see the full-run section below)
+  instead of the old `temp.csv`/`tempdr3.csv` DR2-vs-DR3 comparison (now
+  dead; those files are untouched in the repo but no longer referenced by
+  anything). Three sections: galactic X-Y positions of `pm_match=True`
+  candidates (excluding any with a non-positive Gaia distance, since that
+  can't be placed in space -- e.g. PSR J1543-5149), a log-log Gaia-vs-DM
+  distance comparison, and a full summary table (this one keeps every
+  confirmed candidate, including the unplottable ones). Both plots split by
+  `low_parallax_significance` using the validated categorical palette from
+  the `dataviz` skill (`#2a78d6` blue = reliable, `#eb6834` orange =
+  flagged); reference points (Galactic Center, Solar System Barycenter) use
+  muted gray with distinct marker shapes, not a third data color. **The
+  Gaia-vs-DM plot already shows a real, useful pattern**: reliable-parallax
+  points cluster near the 1:1 line, flagged ones scatter well off it --
+  independent evidence the significance flag is catching real problems, not
+  just noise.
+  - **Environment note**: in this sandbox, `%matplotlib inline`'s automatic
+    figure-capture hook silently produced zero output for both plotting
+    cells when executed via `jupyter nbconvert --execute` (reproduced with a
+    minimal 2-cell notebook, so it's not specific to this notebook's code --
+    likely some interaction with `debugpy`/`ipykernel` in this environment).
+    Explicit `plt.show()` at the end of each plotting cell fixed it. If
+    plots ever silently vanish again when re-executing this notebook, that's
+    the first thing to check.
+  - To (re)run this notebook end to end from the command line:
+    `python3 -m nbconvert --to notebook --execute --inplace galactic_projections.ipynb`.
 - `eliminating_test.py` was rewritten against the new DataFrame-based API:
   unit tests for `read_atnf_long_with_errors`, `filter_position_uncertainty`,
   `filter_binary`, `filter_in_globular`, `confirm_proper_motion`, and
@@ -260,8 +286,15 @@ added to this run's output).
   (see above) didn't break anything. PSR J1023+0038 (a well-known
   transitional MSP) came back at 1417.9 pc via `gspphot` vs. 1112.4 pc via
   DM — same ballpark, independent methods.
-- galactic_projections.ipynb has not yet been updated to plot this output
-  (still targets the old pre-Phase-1 format) -- next real step.
+- `galactic_projections.ipynb` has since been updated to plot this exact
+  output (see above) -- confirms the same 6-reliable/7-flagged split and
+  shows the Gaia-vs-DM distance agreement pattern visually.
+- `full_crossmatch_results.csv` and its checkpoint/log siblings are
+  gitignored (`full_crossmatch_*` in `.gitignore`) -- they're local run
+  artifacts, not committed source. This means **a fresh clone won't have
+  this file**, so `galactic_projections.ipynb` won't run until
+  `matching_pipeline()` is run again locally (see the note at the top of
+  the notebook).
 
 ## Known open issues
 
@@ -269,11 +302,13 @@ added to this run's output).
   machine (see above) — only the dedicated `pygedm` conda env has it. Not an
   issue on Annika's side; just remember to use that env for anything
   DM-distance-related until/unless the main env's toolchain is fixed.
-- `galactic_projections.ipynb` targets the pre-Phase-1 output format/columns
-  and needs updating before it can plot new pipeline output (now that a real
-  results file, `full_crossmatch_results.csv`, actually exists to plot).
 - A `pd.concat` `FutureWarning` shows up in `get_matches()`'s checkpoint
   writes (empty/all-NA frame concatenation) -- cosmetic, not yet cleaned up.
+- The galactic-positions plot's equal-aspect scaling (correct for spatial
+  data) makes the local cluster of points hard to see in detail once the
+  Galactic Center (8.1 kpc away) is on the same axes -- fine for now, but a
+  zoomed inset or a separate close-up view would read better if this plot
+  is used in an actual writeup.
 
 ## Known rough edges to keep in mind
 

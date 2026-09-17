@@ -15,8 +15,9 @@ The end goal is to use confirmed companions to improve distance estimates for th
 are often better constrained than pulsar-timing or dispersion-measure-based distances. **Project status:**
 the full pipeline is implemented: position-based cross-matching against Gaia DR3, confirming candidates by
 proper-motion agreement (`confirm_proper_motion`), and comparing Gaia-based distances
-(`add_gaia_distance`) against DM-based distances (`add_dm_distance`, via the `pygedm` YMW16 model). Producing
-and writing up results across a full pulsar sample is in progress. The longer-term goal is to generalize the
+(`add_gaia_distance`) against DM-based distances (`add_dm_distance`, via the `pygedm` YMW16 model). A first
+full run against the ATNF catalogue has been completed and plotted (`galactic_projections.ipynb`); broadening
+that run and digging further into the results is ongoing. The longer-term goal is to generalize the
 pipeline to cross-match other pulsar catalogues (e.g. the MeerKAT Thousand Pulsar Array) against other optical
 surveys (e.g. PanSTARRS, OGLE), not just ATNF against Gaia. See `CLAUDE.md` for the full current status and
 roadmap.
