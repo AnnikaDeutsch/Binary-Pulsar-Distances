@@ -53,15 +53,38 @@ being resumed with two goals, in order:
   (derived via `astropy.coordinates.SkyCoord`, needed for DM-distance).
 - `Binary_Pulsar_Distances/eliminating.py` is now: `filter_position_uncertainty`
   (real arcsec cutoff, replacing the old exponent-sign heuristic) →
-  `filter_binary` → `filter_in_globular` → `get_matches` (Gaia DR3 cone
-  search per pulsar, carrying every ATNF column through onto each matched
-  Gaia row) → `confirm_proper_motion` (flags `pm_match` via a 3-sigma
+  `filter_binary` → `filter_has_proper_motion` (see below) →
+  `filter_in_globular` → `get_matches` (Gaia DR3 cone search per pulsar,
+  carrying every ATNF column through onto each matched Gaia row) →
+  `confirm_proper_motion` (flags `pm_match` via a 3-sigma
   combined-uncertainty comparison of ATNF vs. Gaia proper motion) →
   `add_gaia_distance` (prefers Gaia DR3's own `distance_gspphot`, falls back
-  to naive inverse-parallax) → `add_dm_distance` (DM → distance via the
-  `pygedm` YMW16 model). `matching_pipeline()` orchestrates all of the above.
-  The old `check_binary`/`check_pos_uncertainty`/`check_in_globular`/raw
+  to naive inverse-parallax; flags `low_parallax_significance` -- see below)
+  → `add_dm_distance` (DM → distance via the `pygedm` YMW16 model).
+  `matching_pipeline()` orchestrates all of the above. The old
+  `check_binary`/`check_pos_uncertainty`/`check_in_globular`/raw
   `get_matches` functions were replaced outright, not kept as shims.
+- `filter_has_proper_motion()`: **found via a real full-catalogue run**
+  crashing on PSR J0045-7319, which has no measured ATNF proper motion at
+  all. Propagating a NaN PM produces a NaN sky position, which Gaia's
+  archive deterministically rejects with an HTTP 500 every time -- not
+  transient, so retries just wasted time before still crashing. Turned out
+  **116 of the 255 pulsars surviving the other filters** (nearly half) lack
+  a measured PM, so this filter now runs before `get_matches()`
+  (255 → 139 candidates actually queried). A pulsar without PM can't be
+  propagated *or* PM-confirmed anyway, so this isn't a big loss of
+  information -- it's information the pipeline literally can't use yet.
+- `add_gaia_distance()`'s `low_parallax_significance` flag: **found in the
+  first real full run's output** -- PSR J1543-5149's match had
+  `parallax_over_error ≈ -0.06` (consistent with noise, not a real
+  parallax), which the naive inverse-parallax fallback turned into a
+  physically meaningless **-56089 pc**. Per Annika's call, these rows are
+  **flagged, not dropped** (`low_parallax_significance` boolean column,
+  threshold `min_parallax_significance=3.0` on
+  `parallax_over_error`/computed `parallax/parallax_error`) -- kept on
+  record to revisit against future Gaia data releases or other optical
+  surveys, since a low-significance match now isn't necessarily wrong,
+  just unconfirmable with current data.
 - Removed a hardcoded special case in the old `psr_to_gaia` that forced a
   fixed 5 arcsec search radius for one specific pulsar (`J0437-4715`) with no
   documented justification — inconsistent with the "generalizable" goal, and
@@ -171,7 +194,25 @@ being resumed with two goals, in order:
   log of completed JNames, so an interrupted run (e.g. a persistent Gaia
   outage after retries are exhausted) can be resumed by calling it again
   with the same `checkpoint_file` path rather than restarting from scratch.
-  `matching_pipeline()` passes all three through.
+  A pulsar that still fails after exhausting retries is skipped (not fatal
+  to the whole batch) and recorded in `<checkpoint_file>.failed` for review.
+  `matching_pipeline()` passes all of this through.
+- **`psr_to_gaia()` also has a `query_timeout_seconds` (default 120s) hard
+  wall-clock timeout per attempt, found necessary by a real run hanging.**
+  `astroquery`'s Gaia TAP+ client has no configurable request timeout at
+  all -- a real run sat with an `ESTABLISHED` TCP connection to
+  `gea.esac.esa.int` and 0% CPU for **over an hour** with zero progress,
+  because the underlying HTTP call simply never returned or errored (so the
+  existing retry-on-exception logic never even triggered). Each attempt is
+  now run in a worker thread (`concurrent.futures.ThreadPoolExecutor`,
+  module-level `_QUERY_EXECUTOR`) bounded by `future.result(timeout=...)`;
+  a timeout is treated as just another retryable failure. Note this can't
+  actually kill a truly stuck request -- the abandoned thread lingers until
+  its own connection eventually resolves -- but it stops the *caller* from
+  blocking forever. (In that same real run, the stuck query happened to
+  resolve on its own after roughly an hour, and the run finished
+  successfully before this fix was even deployed -- but don't count on that;
+  the timeout is the actual fix.)
 - **Investigated whether a single batched query (upload the whole pulsar
   list to Gaia's TAP+ service, one ADQL join against `gaiadr3.gaia_source`)
   would be faster than one query per pulsar — empirically, it was not.**
@@ -188,6 +229,40 @@ being resumed with two goals, in order:
   remains the recommended approach. The CDS X-Match service
   (`astroquery.xmatch`) was considered but not tested as an alternative.
 
+## First full real run (2026-09-16/17)
+
+Ran `matching_pipeline()` against the full `all_atnf.csv` fixture (via the
+`pygedm` env, `checkpoint_file='full_crossmatch_checkpoint.csv'`). Output:
+`full_crossmatch_results.csv` (final, with `pm_match`/distances/significance
+flag) and `full_crossmatch_checkpoint.csv` (raw pre-distance matches, so
+distance/significance logic can be recomputed later without re-querying
+Gaia -- this is how the `low_parallax_significance` flag was retroactively
+added to this run's output).
+
+- **139/139 pulsars processed, 0 permanent failures.** Took much longer than
+  the small-sample estimate (see the ~90-minute estimate above) — closer to
+  a few hours, mostly due to the hour-long hang described above plus a
+  slower-than-sampled average query time; the ~21.5s/query figure was from a
+  small sample and shouldn't be taken as a tight bound.
+- **24 pulsars** have at least one Gaia candidate within 1 arcsec; **13 pass
+  proper-motion confirmation** (`pm_match=True`).
+- **Of those 13, 7 have `low_parallax_significance=True`** (J0337+1715,
+  J1048+2339, J1543-5149, J1653-0158, J1959+2048, J2039-5617, J2339-0533) —
+  so only **6** (J0437-4715, J1012+5307, J1023+0038, J1227-4853, J1417-4402,
+  J1723-2837) currently have both PM agreement *and* a trustworthy distance.
+  This is the real headline number for "how many pulsars got a usable
+  improved distance from this run," not the 13.
+- **Sanity checks against known sources both passed:** PSR J0437-4715 (a
+  famous nearby MSP; the pulsar itself is the historical Gaia detection,
+  not a companion) came back at 140.8 pc via inverse-parallax vs. its own
+  YMW16 DM-distance of 156.1 pc — good agreement, and also confirms
+  removing the old hardcoded 5-arcsec special case for this exact pulsar
+  (see above) didn't break anything. PSR J1023+0038 (a well-known
+  transitional MSP) came back at 1417.9 pc via `gspphot` vs. 1112.4 pc via
+  DM — same ballpark, independent methods.
+- galactic_projections.ipynb has not yet been updated to plot this output
+  (still targets the old pre-Phase-1 format) -- next real step.
+
 ## Known open issues
 
 - `pygedm` still doesn't compile in the main working environment on this
@@ -195,10 +270,10 @@ being resumed with two goals, in order:
   issue on Annika's side; just remember to use that env for anything
   DM-distance-related until/unless the main env's toolchain is fixed.
 - `galactic_projections.ipynb` targets the pre-Phase-1 output format/columns
-  and needs updating before it can plot new pipeline output.
-- The `matching_pipeline()` end-to-end test only exercises one real pulsar;
-  a broader validation run (many pulsars, checking the rate of `pm_match`
-  hits and whether any known companions are recovered) hasn't been done yet.
+  and needs updating before it can plot new pipeline output (now that a real
+  results file, `full_crossmatch_results.csv`, actually exists to plot).
+- A `pd.concat` `FutureWarning` shows up in `get_matches()`'s checkpoint
+  writes (empty/all-NA frame concatenation) -- cosmetic, not yet cleaned up.
 
 ## Known rough edges to keep in mind
 

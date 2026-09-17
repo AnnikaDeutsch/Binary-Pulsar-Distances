@@ -1,3 +1,5 @@
+import time as real_time
+from concurrent.futures import TimeoutError as FutureTimeoutError
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -14,6 +16,7 @@ from Binary_Pulsar_Distances.eliminating import (
     add_gaia_distance,
     confirm_proper_motion,
     filter_binary,
+    filter_has_proper_motion,
     filter_in_globular,
     filter_position_uncertainty,
     get_matches,
@@ -94,6 +97,27 @@ class TestFilterBinary:
         assert list(filtered["jname"]) == ["J0023+0923"]
 
 
+class TestFilterHasProperMotion:
+
+    def test_drops_pulsars_with_unmeasured_proper_motion(self):
+        """
+        Found via a real full-catalogue run: PSR J0045-7319 (and ~115 other
+        real ATNF entries) have no measured PMRA/PMDEC at all. Propagating a
+        NaN proper motion produces a NaN sky position, which Gaia's archive
+        deterministically rejects -- so these must be filtered out before
+        get_matches(), not just retried.
+        """
+        df = pd.DataFrame(
+            {
+                "jname": ["J0000+0000", "J0001+0000", "J0002+0000"],
+                "pmra_masyr": [1.0, np.nan, 2.0],
+                "pmdec_masyr": [1.0, 2.0, np.nan],
+            }
+        )
+        filtered = filter_has_proper_motion(df)
+        assert list(filtered["jname"]) == ["J0000+0000"]
+
+
 class TestFilterInGlobular:
 
     def test_removes_known_globular_cluster_pulsar(self):
@@ -155,6 +179,33 @@ class TestAddGaiaDistance:
         assert has_gspphot["distance_method"] == "gspphot"
         assert has_gspphot["gaia_distance_pc"] == pytest.approx(900.0)
 
+    def test_flags_but_keeps_low_and_negative_significance_parallax(self):
+        """
+        Found via a real full-catalogue run: PSR J1543-5149's match had a
+        noisy parallax that inverted to a physically meaningless -56089 pc.
+        Rather than dropping such rows, add_gaia_distance() should flag them
+        (via low_parallax_significance) so they stay on record to revisit
+        with future Gaia data releases or other optical surveys.
+        """
+        matches = pd.DataFrame(
+            {
+                "parallax": [2.0, -0.05, 1.0],
+                "parallax_error": [0.1, 0.9, 5.0],
+                "distance_gspphot": [np.nan, np.nan, np.nan],
+                "distance_gspphot_lower": [np.nan, np.nan, np.nan],
+                "distance_gspphot_upper": [np.nan, np.nan, np.nan],
+            }
+        )
+        result = add_gaia_distance(matches, min_parallax_significance=3.0)
+
+        good, negative, low_sig = result.iloc[0], result.iloc[1], result.iloc[2]
+        assert not good["low_parallax_significance"]
+        assert negative["low_parallax_significance"]
+        assert low_sig["low_parallax_significance"]
+        # Flagged rows are kept, not dropped, with their (possibly nonsensical) distance intact.
+        assert len(result) == 3
+        assert negative["gaia_distance_pc"] < 0
+
 
 class TestAddDmDistance:
 
@@ -211,6 +262,40 @@ class TestPsrToGaiaRetry:
         with pytest.raises(requests.exceptions.HTTPError):
             psr_to_gaia("J0000+0000", 0.0, 0.0, 0.0, 0.0, 55000.0, max_retries=3)
 
+    def test_treats_a_hang_as_a_retryable_failure(self, monkeypatch):
+        """
+        Found via a real full-catalogue run: astroquery's Gaia client has no
+        built-in request timeout, so a stalled server-side job hung a query
+        forever (an ESTABLISHED connection sitting at 0% CPU for over an
+        hour). psr_to_gaia() should bound each attempt with
+        query_timeout_seconds and treat a hang the same as any other
+        retryable failure, not block indefinitely.
+        """
+
+        def hangs(coord, radius_arcsec):
+            real_time.sleep(0.5)
+            return pd.DataFrame({"source_id": [1]})
+
+        monkeypatch.setattr(eliminating_module, "_run_cone_search", hangs)
+        # Note: can't monkeypatch eliminating_module.time.sleep to skip backoff
+        # here, as in the other retry tests -- eliminating_module.time IS the
+        # process-wide `time` module (import aliasing doesn't create a
+        # separate copy), so doing that would also neuter hangs()'s own
+        # real_time.sleep() call above. Use a tiny backoff instead.
+
+        with pytest.raises(FutureTimeoutError):
+            psr_to_gaia(
+                "J0000+0000",
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                55000.0,
+                max_retries=2,
+                backoff_base_seconds=0.01,
+                query_timeout_seconds=0.1,
+            )
+
 
 class TestGetMatchesCheckpointing:
 
@@ -228,23 +313,25 @@ class TestGetMatchesCheckpointing:
 
     def test_resumes_without_requerying_already_completed_pulsars(self, tmp_path, monkeypatch):
         """
-        If get_matches() is interrupted partway through (here, simulated by
-        the second pulsar's query raising), a second call with the same
-        checkpoint_file should skip the pulsar already recorded as done and
-        only query the remaining one.
+        If get_matches() is interrupted partway through by something other
+        than a Gaia request failure (e.g. the process being killed -- a
+        request failure is instead handled by the skip-and-continue behavior
+        tested below, and no longer aborts the run), a second call with the
+        same checkpoint_file should skip the pulsar already recorded as done
+        and only query the remaining one.
         """
         calls = []
 
         def crash_on_second_pulsar(jname, *args, **kwargs):
             calls.append(jname)
             if jname == "J0001+0000":
-                raise requests.exceptions.HTTPError("boom")
+                raise KeyboardInterrupt()
             return pd.DataFrame({"source_id": [1], "jname_echo": [jname]})
 
         checkpoint_file = tmp_path / "checkpoint.csv"
         monkeypatch.setattr(eliminating_module, "psr_to_gaia", crash_on_second_pulsar)
 
-        with pytest.raises(requests.exceptions.HTTPError):
+        with pytest.raises(KeyboardInterrupt):
             get_matches(self._pulsar_df(), checkpoint_file=str(checkpoint_file), max_retries=1)
 
         assert calls == ["J0000+0000", "J0001+0000"]
@@ -260,6 +347,51 @@ class TestGetMatchesCheckpointing:
 
         assert calls == ["J0001+0000"]
         assert sorted(result["jname_echo"]) == ["J0000+0000", "J0001+0000"]
+
+    def test_skips_permanently_failing_pulsar_and_continues(self, tmp_path, monkeypatch):
+        """
+        Found via a real full-catalogue run: a pulsar whose query fails
+        every retry (e.g. PSR J0045-7319, which has no measured proper
+        motion) must not abort the whole batch -- later pulsars should
+        still get queried, and the failure recorded in
+        <checkpoint_file>.failed for review, and in <checkpoint_file>.done
+        so it isn't retried forever on resume.
+        """
+
+        def one_bad_one_good(jname, *args, **kwargs):
+            if jname == "J0000+0000":
+                raise requests.exceptions.HTTPError("Error 500: null")
+            return pd.DataFrame({"source_id": [1], "jname_echo": [jname]})
+
+        monkeypatch.setattr(eliminating_module, "psr_to_gaia", one_bad_one_good)
+        checkpoint_file = tmp_path / "checkpoint.csv"
+
+        result = get_matches(
+            self._pulsar_df(), checkpoint_file=str(checkpoint_file), max_retries=1
+        )
+
+        assert list(result["jname_echo"]) == ["J0001+0000"]
+        with open(f"{checkpoint_file}.done") as f:
+            assert f.read().split() == ["J0000+0000", "J0001+0000"]
+        with open(f"{checkpoint_file}.failed") as f:
+            assert f.read().split() == ["J0000+0000"]
+
+    def test_skips_permanently_failing_pulsar_without_checkpointing(self, monkeypatch):
+        """
+        The skip-and-continue behavior is an unconditional resilience
+        improvement -- it should also apply with checkpoint_file=None.
+        """
+
+        def one_bad_one_good(jname, *args, **kwargs):
+            if jname == "J0000+0000":
+                raise requests.exceptions.HTTPError("Error 500: null")
+            return pd.DataFrame({"source_id": [1], "jname_echo": [jname]})
+
+        monkeypatch.setattr(eliminating_module, "psr_to_gaia", one_bad_one_good)
+
+        result = get_matches(self._pulsar_df(), max_retries=1)
+
+        assert list(result["jname_echo"]) == ["J0001+0000"]
 
 
 class TestMatchingPipeline:

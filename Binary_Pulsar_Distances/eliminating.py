@@ -1,5 +1,6 @@
 import os
 import time
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
 
 import numpy as np
 import pandas as pd
@@ -10,6 +11,15 @@ from astropy.time import Time
 from astroquery.gaia import Gaia
 
 from .atnf import read_atnf_long_with_errors
+
+# astroquery/the Gaia TAP+ client has no configurable request timeout, so a
+# stalled server-side job or network black hole can hang a query forever.
+# Queries are run in a worker thread and bounded by this wall-clock timeout
+# instead; a hang is treated the same as any other transient failure (see
+# psr_to_gaia). The thread itself can't be killed if it's genuinely stuck --
+# it's abandoned and the underlying connection will eventually time out on
+# its own -- but the calling loop is freed to retry or move on.
+_QUERY_EXECUTOR = ThreadPoolExecutor(max_workers=4)
 
 
 def filter_position_uncertainty(df, max_arcsec=1.0):
@@ -50,6 +60,27 @@ def filter_binary(df):
     return df[df["binary_type"] != "*"].reset_index(drop=True)
 
 
+def filter_has_proper_motion(df):
+    """Keep only pulsars with a measured proper motion.
+
+    Both propagating a pulsar's position to the Gaia epoch and confirming a
+    candidate by proper-motion agreement require a measured proper motion.
+    Pulsars ATNF marks as unmeasured in PMRA or PMDEC can't be used by
+    either step -- attempting to propagate a NaN proper motion produces a
+    NaN sky position, which Gaia's archive deterministically rejects with
+    an HTTP 500 (this was found by a real full-catalogue run crashing on
+    exactly this case: PSR J0045-7319, which has no measured proper motion).
+
+    Args:
+        df (pandas.DataFrame): Pulsar table with ``pmra_masyr``/``pmdec_masyr`` columns.
+
+    Returns:
+        pandas.DataFrame: The rows that pass the cut.
+    """
+    mask = df["pmra_masyr"].notna() & df["pmdec_masyr"].notna()
+    return df[mask].reset_index(drop=True)
+
+
 def _load_globular_cluster_names(gc_names_path=None):
     if gc_names_path is None:
         package_dir = os.path.dirname(os.path.abspath(__file__))
@@ -77,6 +108,11 @@ def filter_in_globular(df, gc_names=None):
     return df[~df["jname"].isin(gc_names)].reset_index(drop=True)
 
 
+def _run_cone_search(coord, radius_arcsec):
+    job = Gaia.cone_search_async(coordinate=coord, radius=u.Quantity(radius_arcsec, u.arcsec))
+    return job.get_results().to_pandas()
+
+
 def psr_to_gaia(
     jname,
     raj_deg,
@@ -87,6 +123,7 @@ def psr_to_gaia(
     radius_arcsec=1.0,
     max_retries=5,
     backoff_base_seconds=5.0,
+    query_timeout_seconds=120.0,
 ):
     """Cone-searches Gaia DR3 for a possible companion to one pulsar.
 
@@ -94,9 +131,10 @@ def psr_to_gaia(
     DR3 reference epoch (2016.0) using its proper motion, then searches for
     Gaia sources within ``radius_arcsec`` of that propagated position.
 
-    Transient failures (network errors, or an HTTP error from the Gaia
-    archive) are retried with exponential backoff, since a large batch of
-    queries is likely to hit at least one such failure.
+    Transient failures (network errors, an HTTP error from the Gaia archive,
+    or the query hanging past ``query_timeout_seconds``) are retried with
+    exponential backoff, since a large batch of queries is likely to hit at
+    least one such failure.
 
     Args:
         jname (str): Name of the pulsar being checked for matches.
@@ -109,12 +147,17 @@ def psr_to_gaia(
         max_retries (int, optional): Number of attempts before giving up.
         backoff_base_seconds (float, optional): Base delay for exponential
             backoff between retries (doubles each attempt).
+        query_timeout_seconds (float, optional): Maximum time to wait for one
+            attempt before treating it as failed and retrying. Needed because
+            astroquery's Gaia client has no built-in request timeout, so a
+            stalled server-side job would otherwise hang forever.
 
     Returns:
         pandas.DataFrame: Gaia DR3 sources found in the search (may be empty).
 
     Raises:
         requests.exceptions.RequestException: If every retry attempt fails.
+        concurrent.futures.TimeoutError: If every retry attempt times out.
     """
     gaia_epoch = Time("2016.0", format="jyear").jyear
     p_epoch = Time(posepoch_mjd, format="mjd").jyear
@@ -132,35 +175,51 @@ def psr_to_gaia(
 
     for attempt in range(max_retries):
         try:
-            job = Gaia.cone_search_async(coordinate=coord, radius=u.Quantity(radius_arcsec, u.arcsec))
-            results = job.get_results()
-            return results.to_pandas()
-        except requests.exceptions.RequestException:
+            future = _QUERY_EXECUTOR.submit(_run_cone_search, coord, radius_arcsec)
+            return future.result(timeout=query_timeout_seconds)
+        except (requests.exceptions.RequestException, FutureTimeoutError) as exc:
             if attempt == max_retries - 1:
                 raise
+            reason = "timed out" if isinstance(exc, FutureTimeoutError) else "failed"
             wait_seconds = backoff_base_seconds * (2**attempt)
             print(
-                f"Gaia query for {jname} failed (attempt {attempt + 1}/{max_retries}); "
+                f"Gaia query for {jname} {reason} (attempt {attempt + 1}/{max_retries}); "
                 f"retrying in {wait_seconds:.0f}s"
             )
             time.sleep(wait_seconds)
 
 
-def get_matches(df, radius_arcsec=1.0, max_retries=5, backoff_base_seconds=5.0, checkpoint_file=None):
+def get_matches(
+    df,
+    radius_arcsec=1.0,
+    max_retries=5,
+    backoff_base_seconds=5.0,
+    query_timeout_seconds=120.0,
+    checkpoint_file=None,
+):
     """Cross-matches each pulsar in ``df`` against Gaia DR3.
+
+    A pulsar whose query still fails after exhausting retries (e.g. because
+    of some data problem specific to that pulsar, or a server-side hang) is
+    skipped, not fatal to the whole run -- it's recorded in
+    ``<checkpoint_file>.failed`` for later review, and matching continues
+    with the remaining pulsars.
 
     Args:
         df (pandas.DataFrame): Pulsar table from :func:`read_atnf_long_with_errors`
             (optionally filtered by :func:`filter_position_uncertainty`,
-            :func:`filter_binary`, :func:`filter_in_globular`).
+            :func:`filter_binary`, :func:`filter_has_proper_motion`,
+            :func:`filter_in_globular`).
         radius_arcsec (float, optional): Radius of the Gaia cone search, in arcsec.
         max_retries (int, optional): See :func:`psr_to_gaia`.
         backoff_base_seconds (float, optional): See :func:`psr_to_gaia`.
+        query_timeout_seconds (float, optional): See :func:`psr_to_gaia`.
         checkpoint_file (str, optional): Path to a CSV to incrementally save
             progress to after each pulsar. If it already exists (from a
-            previous, interrupted run), pulsars already recorded there are
-            skipped rather than re-queried, so an interrupted run can be
-            resumed by calling this again with the same path.
+            previous run), pulsars already recorded there (successful or
+            permanently failed) are skipped rather than re-queried, so an
+            interrupted run can be resumed by calling this again with the
+            same path.
 
     Returns:
         pandas.DataFrame: One row per (pulsar, Gaia candidate) pair, with all
@@ -168,6 +227,7 @@ def get_matches(df, radius_arcsec=1.0, max_retries=5, backoff_base_seconds=5.0, 
             Empty if no pulsar had any candidates.
     """
     done_log = f"{checkpoint_file}.done" if checkpoint_file else None
+    failed_log = f"{checkpoint_file}.failed" if checkpoint_file else None
     processed = set()
     frames = []
 
@@ -186,17 +246,28 @@ def get_matches(df, radius_arcsec=1.0, max_retries=5, backoff_base_seconds=5.0, 
         if jname in processed:
             continue
 
-        gaia_matches = psr_to_gaia(
-            jname,
-            pulsar_attrs["raj_deg"],
-            pulsar_attrs["decj_deg"],
-            pulsar_attrs["pmra_masyr"],
-            pulsar_attrs["pmdec_masyr"],
-            pulsar_attrs["posepoch_mjd"],
-            radius_arcsec=radius_arcsec,
-            max_retries=max_retries,
-            backoff_base_seconds=backoff_base_seconds,
-        )
+        try:
+            gaia_matches = psr_to_gaia(
+                jname,
+                pulsar_attrs["raj_deg"],
+                pulsar_attrs["decj_deg"],
+                pulsar_attrs["pmra_masyr"],
+                pulsar_attrs["pmdec_masyr"],
+                pulsar_attrs["posepoch_mjd"],
+                radius_arcsec=radius_arcsec,
+                max_retries=max_retries,
+                backoff_base_seconds=backoff_base_seconds,
+                query_timeout_seconds=query_timeout_seconds,
+            )
+        except (requests.exceptions.RequestException, FutureTimeoutError) as exc:
+            print(f"Giving up on {jname} after {max_retries} attempts ({exc}); skipping")
+            processed.add(jname)
+            if checkpoint_file is not None:
+                with open(done_log, "a") as f:
+                    f.write(jname + "\n")
+                with open(failed_log, "a") as f:
+                    f.write(jname + "\n")
+            continue
 
         if len(gaia_matches) > 0:
             for key, value in pulsar_attrs.items():
@@ -243,23 +314,35 @@ def confirm_proper_motion(matches_df, n_sigma=3.0):
     return df
 
 
-def add_gaia_distance(matches_df):
+def add_gaia_distance(matches_df, min_parallax_significance=3.0):
     """Adds a Gaia-based distance estimate to each match.
 
     Prefers Gaia DR3's own ``distance_gspphot`` (a photometric+parallax
     distance with a proper Galactic prior) where available, falling back to
     a naive inverse-parallax distance otherwise.
 
+    A low- or negative-significance parallax (``parallax / parallax_error``
+    below ``min_parallax_significance``) makes any distance estimate for
+    that source unreliable -- and is itself a sign the match may be a chance
+    alignment rather than a real companion. These rows are flagged, not
+    dropped: even an unreliable match is worth keeping on record to revisit
+    against future Gaia data releases or other optical surveys.
+
     Args:
         matches_df (pandas.DataFrame): Output of :func:`get_matches` (or
             :func:`confirm_proper_motion`), with Gaia's ``parallax``,
             ``parallax_error``, and (if present) ``distance_gspphot``,
-            ``distance_gspphot_lower``, ``distance_gspphot_upper`` columns.
+            ``distance_gspphot_lower``, ``distance_gspphot_upper``,
+            ``parallax_over_error`` columns.
+        min_parallax_significance (float, optional): Minimum
+            ``parallax / parallax_error`` to trust a distance estimate.
 
     Returns:
         pandas.DataFrame: ``matches_df`` with added ``gaia_distance_pc``,
-            ``gaia_distance_lower_pc``, ``gaia_distance_upper_pc``, and
-            ``distance_method`` (``"gspphot"`` or ``"parallax_inverse"``) columns.
+            ``gaia_distance_lower_pc``, ``gaia_distance_upper_pc``,
+            ``distance_method`` (``"gspphot"`` or ``"parallax_inverse"``),
+            ``parallax_significance``, and boolean
+            ``low_parallax_significance`` columns.
     """
     df = matches_df.copy()
     n = len(df)
@@ -279,6 +362,10 @@ def add_gaia_distance(matches_df):
     df["gaia_distance_lower_pc"] = np.where(use_gspphot, gspphot_lower, fallback_dist - fallback_err)
     df["gaia_distance_upper_pc"] = np.where(use_gspphot, gspphot_upper, fallback_dist + fallback_err)
     df["distance_method"] = np.where(use_gspphot, "gspphot", "parallax_inverse")
+
+    parallax_significance = _column_or_nan("parallax_over_error").fillna(df["parallax"] / df["parallax_error"])
+    df["parallax_significance"] = parallax_significance
+    df["low_parallax_significance"] = parallax_significance < min_parallax_significance
     return df
 
 
@@ -365,11 +452,13 @@ def matching_pipeline(
     max_pos_err_arcsec=1.0,
     radius_arcsec=1.0,
     n_sigma=3.0,
+    min_parallax_significance=3.0,
     gc_names=None,
     include_dm_distance=True,
     pretty_print_output=False,
     max_retries=5,
     backoff_base_seconds=5.0,
+    query_timeout_seconds=120.0,
     checkpoint_file=None,
 ):
     """Runs the full ATNF-to-Gaia cross-match pipeline end to end.
@@ -385,6 +474,7 @@ def matching_pipeline(
         max_pos_err_arcsec (float, optional): See :func:`filter_position_uncertainty`.
         radius_arcsec (float, optional): See :func:`get_matches`.
         n_sigma (float, optional): See :func:`confirm_proper_motion`.
+        min_parallax_significance (float, optional): See :func:`add_gaia_distance`.
         gc_names (set, optional): See :func:`filter_in_globular`.
         include_dm_distance (bool, optional): Whether to add a DM-based
             distance via :func:`add_dm_distance` (requires ``pygedm``).
@@ -392,6 +482,7 @@ def matching_pipeline(
             human-readable ``output_file + '.txt'`` via :func:`pretty_print_matches`.
         max_retries (int, optional): See :func:`get_matches`.
         backoff_base_seconds (float, optional): See :func:`get_matches`.
+        query_timeout_seconds (float, optional): See :func:`get_matches`.
         checkpoint_file (str, optional): See :func:`get_matches` -- recommended
             for any large run, so it can be resumed if interrupted.
 
@@ -401,6 +492,7 @@ def matching_pipeline(
     df = read_atnf_long_with_errors(input_file)
     df = filter_position_uncertainty(df, max_arcsec=max_pos_err_arcsec)
     df = filter_binary(df)
+    df = filter_has_proper_motion(df)
     df = filter_in_globular(df, gc_names=gc_names)
 
     matches = get_matches(
@@ -408,11 +500,12 @@ def matching_pipeline(
         radius_arcsec=radius_arcsec,
         max_retries=max_retries,
         backoff_base_seconds=backoff_base_seconds,
+        query_timeout_seconds=query_timeout_seconds,
         checkpoint_file=checkpoint_file,
     )
     if len(matches) > 0:
         matches = confirm_proper_motion(matches, n_sigma=n_sigma)
-        matches = add_gaia_distance(matches)
+        matches = add_gaia_distance(matches, min_parallax_significance=min_parallax_significance)
         if include_dm_distance:
             matches = add_dm_distance(matches)
 
